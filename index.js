@@ -1,6 +1,90 @@
 document.addEventListener("DOMContentLoaded", _ => {
+
+const assert = (condition) => {
+    if (typeof condition !== "boolean") {
+        console.error(condition, typeof condition)
+        throw new Error("expected boolean")
+    }
+    if (!condition) {
+        throw new Error('assertion error')
+    }
+}
+
 const bytesperrow = 4
 const numrows = 10
+
+const typesSize = {
+    'int': 4,
+    'char': 1,
+}
+const pointersSize = 1
+
+const memory = {}
+
+const getMemoryObject = (type, bytesValues, reprValue, variableName) => {
+    assert(typeof type === "string")
+    assert(bytesValues !== undefined)
+    assert(typeof reprValue === "string")
+    assert(typeof variableName === "string")
+
+    if (type[type.length - 1] === '*') {
+        assert(bytesValues.length === pointersSize)
+    } else {
+        assert(typesSize[type] !== undefined)
+        assert(typesSize[type] === bytesValues.length)
+    }
+
+    return {
+        type: type,
+        bytes: bytesValues,
+        repr: reprValue,
+        var: variableName,
+    }
+}
+
+const getCharMemoryObject = (variable, char) => {
+    assert(char.length === 1)
+    assert(char.charCodeAt(0) < 128)
+    return getMemoryObject(
+        'char',
+        [char.charCodeAt(0).toString(2).padStart('8', 0)],
+        JSON.stringify(char),
+        variable,
+    )
+}
+
+const addMemoryObject = (addr, memobj) => {
+    assert(addr > 0)
+    assert(addr + memobj.bytes.length <= numrows * bytesperrow)
+    const x = addr % bytesperrow
+    const y = (addr - x) / bytesperrow
+
+    let row = memoryTable.firstElementChild
+    for (let i = 0; i < y; i++) {
+        row = row.nextElementSibling
+        assert(row !== null)
+    }
+
+    // select nextElementSibling to ignore the <th>
+    let cell = row.firstElementChild.nextElementSibling
+    for (let i = 0; i < x; i++) {
+        cell = cell.nextElementSibling
+    }
+
+    for (let i = 0; i < memobj.bytes.length; i++) {
+        if (x + i === bytesperrow) {
+            row = row.nextElementSibling
+            assert(row !== null)
+            cell = row.firstElementChild.nextElementSibling
+        }
+        assert(cell !== null)
+        cell.textContent = memobj.bytes[i]
+        cell = cell.nextElementSibling
+    }
+
+    memory[addr] = memobj
+}
+
 
 const getMemoryTableRow = (rownum, bytesperrow) => {
     const row = document.createElement('tr')
@@ -26,5 +110,9 @@ for (let i = 0; i < numrows; i++) {
 
 memoryView.innerHTML = ''
 memoryView.appendChild(memoryTable)
+
+addMemoryObject(0x1, getCharMemoryObject('var1', 'a'))
+addMemoryObject(0x2, getCharMemoryObject('var2', 'b'))
+addMemoryObject(0x3, getCharMemoryObject('var3', 'c'))
 
 })

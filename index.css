@@ -46,9 +46,15 @@ h1 {
 
 .memory-table td {
   border: 1px solid #bdc3c7;
+  width: 92px;
+  height: 32px;
+  vertical-align: bottom;
+  text-align: center;
 }
 
 .memory-table th {
   font-weight: normal;
-  width: 64px;
+  vertical-align: bottom;
+  padding-right: 4px;
+  text-align: right;
 }
