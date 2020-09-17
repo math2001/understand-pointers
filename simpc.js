@@ -17,7 +17,7 @@ const runSimpC = (function() {
         done() {
             assert(this.i >= 0)
             assert(this.i <= this.tokens.length)
-            return this.i === this.token.length
+            return this.i === this.tokens.length
         }
     }
 

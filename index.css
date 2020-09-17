@@ -37,6 +37,12 @@ h1 {
   font-family: var(--monospace);
   border: 1px solid #34495e;
   padding: 12px;
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.editor .highlight-line {
+  background-color: #f1c40f;
 }
 
 .memory-table {

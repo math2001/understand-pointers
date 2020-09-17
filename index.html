@@ -16,8 +16,9 @@
         </section>
         <section class="split">
             <article class="code-view" id="code-view">
-                <div class="editor" id="editor" contenteditable>
-                </div>
+                <!-- this br is needed, because otherwise the first enter
+                doesn't do anything -->
+                <textarea class="editor" id="editor"></textarea>
             </article><!-- this comment is important
              --><article class="memory-view" id="memory-view">
                 Generating memory table...

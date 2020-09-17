@@ -139,9 +139,115 @@ const getMemoryTableRow = (rownum, bytesperrow) => {
     return row
 }
 
-const memoryView = document.querySelector("#memory-view")
+const memoryView = select("#memory-view")
+const runlineButton = select("#run-line")
+const editor = select("#editor")
+
 const memoryTable = document.createElement('table')
 memoryTable.classList.add('memory-table')
+
+let activeLineIndex = -1
+let sourcecode = ""
+
+const updateEditor = () => {
+    assert(activeLineIndex >= -1)
+    const lines = sourcecode.split('\n')
+    assert(activeLineIndex < lines.length)
+
+    // reset all the extra html
+    editor.textContent = sourcecode
+    // each line is in its own div
+    // window.editor = editor
+    // let linediv = editor.firstElementChild
+    // assert(linediv !== null)
+    // for (let i = 0; i < activeLineIndex; i++) {
+    //     linediv = linediv.nextElementSibling
+    //     assert(linediv !== null)
+    // }
+    // linediv.classList.add("highlight-line")
+}
+
+runlineButton.addEventListener("click", e => {
+    e.preventDefault()
+    if (sourcecode === "") {
+        return
+    }
+
+    activeLineIndex++
+    const lines = sourcecode.split('\n')
+    // ignore empty lines
+    while (lines[activeLineIndex].strip() === "")
+    assert(activeLineIndex < lines.length)
+    runSimpC(lines[activeLineIndex], memory)
+})
+
+editor.addEventListener("input", e => {
+        editor.textContent = editor.textContent
+        return
+    // reset everything
+    sourcecode = editor.textContent
+    activeLineIndex = -1
+
+    const selection = window.getSelection()
+    const range = selection.getRangeAt(0)
+
+    let onNewLine = !(range.startContainer instanceof Text)
+    assert(range.startOffset === range.endOffset)
+
+    let index = range.startOffset
+    let container = range.startContainer
+    console.log(container)
+    // if (onNewLine) {
+    //     index = range.startOffset
+    // } else {
+        // range.setStart(editor, 0)
+        // index = range.toString().length
+    // }
+
+    console.log('---', index, onNewLine)
+
+    try {
+        // updateEditor()
+
+        console.log
+    } finally {
+        return
+        if (onNewLine) {
+            // node = editor.firstChild
+            // for (let i = 0; i < index / 2; i++) {
+            //     node = node.nextSibling
+            // }
+            // node = node
+            // index = 0
+            const selection = window.getSelection()
+            selection.removeAllRanges()
+            const newRange = new Range()
+            newRange.setStart(editor, index)
+            selection.addRange(newRange)
+            return
+        }
+
+        const node = document.createTreeWalker(editor, NodeFilter.SHOW_TEXT, elem => {
+            if (index > elem.textContent.length) {
+                index -= elem.textContent.length
+                return NodeFilter.FILTER_REJECT
+            }
+            return NodeFilter.FILTER_ACCEPT
+        }).nextNode() || editor
+
+        assert(node !== false)
+
+        // console.log(node, index)
+
+        const selection = window.getSelection()
+        selection.removeAllRanges()
+        const newRange = new Range()
+        newRange.setStart(node, index)
+        selection.addRange(newRange)
+    }
+})
+
+editor.focus()
 
 for (let i = 0; i < numrows; i++) {
     const row = getMemoryTableRow(i, bytesperrow)
@@ -152,11 +258,11 @@ memoryView.innerHTML = ''
 memoryView.appendChild(memoryTable)
 
 const memory = new Memory(numrows * bytesperrow, memoryTable)
-memory.initialize('var1', 'char', 'a')
-memory.initialize('var2', 'char', 'b')
-memory.initialize('var3', 'char', 'c')
-memory.initialize('var4', 'char', 'd')
-memory.initialize('var5', 'char', 'e')
-memory.initialize('var6', 'char', 'f')
-memory.initialize('var7', 'char', 'g')
+// memory.initialize('var1', 'char', 'a')
+// memory.initialize('var2', 'char', 'b')
+// memory.initialize('var3', 'char', 'c')
+// memory.initialize('var4', 'char', 'd')
+// memory.initialize('var5', 'char', 'e')
+// memory.initialize('var6', 'char', 'f')
+// memory.initialize('var7', 'char', 'g')
 })
