@@ -1,19 +1,6 @@
 const runSimpC = (function() {
     const types = ['int', 'char']
 
-    const isdigit = char => {
-        assert(char.length === 1)
-        return c.charCodeAt(0) >= '0'.charCodeAt(0) && c.charCodeAt(0) <= '9'.charCodeAt(0)
-    }
-
-    const isletter = char => {
-        assert(char.length === 1)
-        return (
-            (c.charCodeAt(0) >= 'a'.charCodeAt(0) && c.charCodeAt(0) <= 'z'.charCodeAt(0)) ||
-            (c.charCodeAt(0) >= 'A'.charCodeAt(0) && c.charCodeAt(0) <= 'Z'.charCodeAt(0))
-        )
-    }
-
     class TokenStream {
         constructor(tokens) {
             this.tokens = tokens
@@ -92,7 +79,7 @@ const runSimpC = (function() {
     const istype = word => {
         return (
             word === "int" ||
-            word === "char" ||
+            word === "char"
         )
     }
 
@@ -132,7 +119,7 @@ const runSimpC = (function() {
                 throw new Error("SyntaxError: expected equal token")
             }
             const value = parseExpr(tokenline)
-            memory.initialize(identifier, value)
+            memory.initialize(identifier, type, value)
         }
     }
 })();
