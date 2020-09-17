@@ -56,6 +56,9 @@ const getCharMemoryObject = (variable, char) => {
 const addMemoryObject = (addr, memobj) => {
     assert(addr > 0)
     assert(addr + memobj.bytes.length <= numrows * bytesperrow)
+
+    assert(memobj !== undefined)
+
     const x = addr % bytesperrow
     const y = (addr - x) / bytesperrow
 
@@ -70,6 +73,13 @@ const addMemoryObject = (addr, memobj) => {
     for (let i = 0; i < x; i++) {
         cell = cell.nextElementSibling
     }
+    assert(cell !== null)
+
+    const description = document.createElement('span')
+    description.classList.add("memory-description")
+    description.textContent = `${memobj.type} ${memobj.var} = ${memobj.repr}`
+
+    cell.appendChild(description)
 
     for (let i = 0; i < memobj.bytes.length; i++) {
         if (x + i === bytesperrow) {
@@ -78,9 +88,11 @@ const addMemoryObject = (addr, memobj) => {
             cell = row.firstElementChild.nextElementSibling
         }
         assert(cell !== null)
-        cell.textContent = memobj.bytes[i]
+        const textNode = document.createTextNode(memobj.bytes[i])
+        cell.appendChild(textNode)
         cell = cell.nextElementSibling
     }
+
 
     memory[addr] = memobj
 }
@@ -114,5 +126,6 @@ memoryView.appendChild(memoryTable)
 addMemoryObject(0x1, getCharMemoryObject('var1', 'a'))
 addMemoryObject(0x2, getCharMemoryObject('var2', 'b'))
 addMemoryObject(0x3, getCharMemoryObject('var3', 'c'))
+addMemoryObject(0x16, getCharMemoryObject('var8', 'd'))
 
 })
