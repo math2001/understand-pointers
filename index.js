@@ -1,15 +1,4 @@
 document.addEventListener("DOMContentLoaded", _ => {
-
-const assert = (condition) => {
-    if (typeof condition !== "boolean") {
-        console.error(condition, typeof condition)
-        throw new Error("expected boolean")
-    }
-    if (!condition) {
-        throw new Error('assertion error')
-    }
-}
-
 const bytesperrow = 4
 const numrows = 10
 
@@ -109,6 +98,10 @@ const getMemoryTableRow = (rownum, bytesperrow) => {
         row.appendChild(cell)
     }
     return row
+}
+
+const runLine = (line) => {
+
 }
 
 const memoryView = document.querySelector("#memory-view")
