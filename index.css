@@ -1,0 +1,54 @@
+:root {
+  --monospace: "Roboto Mono", monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #ecf0f1;
+  font-family: "Roboto", sans-serif;
+}
+
+h1 {
+  text-align: center;
+}
+
+.main {
+  background-color: white;
+  width: 960px;
+  margin: auto;
+}
+
+.toolbar {
+  text-align: center;
+  padding: 12px;
+}
+
+.code-view, .memory-view {
+  width: 50%;
+  display: inline-block;
+  padding: 16px;
+  vertical-align: top;
+}
+
+.editor {
+  font-family: var(--monospace);
+  border: 1px solid #34495e;
+  padding: 12px;
+}
+
+.memory-table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.memory-table td {
+  border: 1px solid #bdc3c7;
+}
+
+.memory-table th {
+  font-weight: normal;
+  width: 64px;
+}
