@@ -142,29 +142,31 @@ const getMemoryTableRow = (rownum, bytesperrow) => {
 const memoryView = select("#memory-view")
 const runlineButton = select("#run-line")
 const editor = select("#editor")
+const editorTextarea = select("#editor-textarea")
+const editorView = select("#editor-view")
 
 const memoryTable = document.createElement('table')
 memoryTable.classList.add('memory-table')
 
 let activeLineIndex = -1
-let sourcecode = ""
+let sourcecode = editorTextarea.value
 
 const updateEditor = () => {
     assert(activeLineIndex >= -1)
     const lines = sourcecode.split('\n')
     assert(activeLineIndex < lines.length)
 
-    // reset all the extra html
-    editor.textContent = sourcecode
-    // each line is in its own div
-    // window.editor = editor
-    // let linediv = editor.firstElementChild
-    // assert(linediv !== null)
-    // for (let i = 0; i < activeLineIndex; i++) {
-    //     linediv = linediv.nextElementSibling
-    //     assert(linediv !== null)
-    // }
-    // linediv.classList.add("highlight-line")
+    const start = editorTextarea.selectionStart
+    const end = editorTextarea.selectionEnd
+
+    let html = sourcecode
+    html = html.slice(0, start) + '<span class="cursor"></span>' + html.slice(start)
+
+    html = html.replace(/\n/g, '<br>')
+    // html = html.replace(/hello/g, '<b>hello</b>')
+    // html = html.replace(/yes/g, '<i>yes</i>')
+
+    editorView.innerHTML = html
 }
 
 runlineButton.addEventListener("click", e => {
@@ -181,71 +183,30 @@ runlineButton.addEventListener("click", e => {
     runSimpC(lines[activeLineIndex], memory)
 })
 
-editor.addEventListener("input", e => {
-        editor.textContent = editor.textContent
-        return
-    // reset everything
-    sourcecode = editor.textContent
+editorTextarea.addEventListener("input", e => {
+    sourcecode = editorTextarea.value
     activeLineIndex = -1
 
-    const selection = window.getSelection()
-    const range = selection.getRangeAt(0)
-
-    let onNewLine = !(range.startContainer instanceof Text)
-    assert(range.startOffset === range.endOffset)
-
-    let index = range.startOffset
-    let container = range.startContainer
-    console.log(container)
-    // if (onNewLine) {
-    //     index = range.startOffset
-    // } else {
-        // range.setStart(editor, 0)
-        // index = range.toString().length
-    // }
-
-    console.log('---', index, onNewLine)
-
-    try {
-        // updateEditor()
-
-        console.log
-    } finally {
-        return
-        if (onNewLine) {
-            // node = editor.firstChild
-            // for (let i = 0; i < index / 2; i++) {
-            //     node = node.nextSibling
-            // }
-            // node = node
-            // index = 0
-            const selection = window.getSelection()
-            selection.removeAllRanges()
-            const newRange = new Range()
-            newRange.setStart(editor, index)
-            selection.addRange(newRange)
-            return
-        }
-
-        const node = document.createTreeWalker(editor, NodeFilter.SHOW_TEXT, elem => {
-            if (index > elem.textContent.length) {
-                index -= elem.textContent.length
-                return NodeFilter.FILTER_REJECT
-            }
-            return NodeFilter.FILTER_ACCEPT
-        }).nextNode() || editor
-
-        assert(node !== false)
-
-        // console.log(node, index)
-
-        const selection = window.getSelection()
-        selection.removeAllRanges()
-        const newRange = new Range()
-        newRange.setStart(node, index)
-        selection.addRange(newRange)
-    }
+    updateEditor()
 })
+
+editorTextarea.addEventListener("select", e => {
+    updateEditor()
+})
+editorTextarea.addEventListener("keydown", e => {
+    // motherfucking horrible. But there is no other option
+    setTimeout(updateEditor, 50)
+})
+
+editorTextarea.addEventListener("click", e => {
+    updateEditor()
+})
+
+editorTextarea.addEventListener('scroll', e => {
+    editorView.scrollTop = editorTextarea.scrollTop
+})
+
+updateEditor()
 
 editor.focus()
 
