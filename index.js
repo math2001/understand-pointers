@@ -153,8 +153,6 @@ let sourcecode = editorTextarea.value
 
 const updateEditor = () => {
     assert(activeLineIndex >= -1)
-    const lines = sourcecode.split('\n')
-    assert(activeLineIndex < lines.length)
 
     const start = editorTextarea.selectionStart
     const end = editorTextarea.selectionEnd
@@ -162,25 +160,35 @@ const updateEditor = () => {
     let html = sourcecode
     html = html.slice(0, start) + '<span class="cursor"></span>' + html.slice(start)
 
-    html = html.replace(/\n/g, '<br>')
-    // html = html.replace(/hello/g, '<b>hello</b>')
-    // html = html.replace(/yes/g, '<i>yes</i>')
+    const lines = html.split('\n')
+    assert(activeLineIndex < lines.length)
+    for (let i = 0; i < lines.length; i++) {
+        if (i === activeLineIndex) {
+            lines[i] = '<span class="highlight line">' + lines[i] + '</span>'
+        }
+    }
+    html = lines.join('<br/>')
 
     editorView.innerHTML = html
 }
 
 runlineButton.addEventListener("click", e => {
     e.preventDefault()
-    if (sourcecode === "") {
-        return
-    }
 
     activeLineIndex++
     const lines = sourcecode.split('\n')
-    // ignore empty lines
-    while (lines[activeLineIndex].strip() === "")
-    assert(activeLineIndex < lines.length)
-    runSimpC(lines[activeLineIndex], memory)
+    if (activeLineIndex >= lines.length) {
+        return
+    }
+
+    // runSimpC returns true if a meaningful line of code was run
+    while (activeLineIndex < lines.length && !runSimpC(lines[activeLineIndex], memory)) {
+        activeLineIndex++
+    }
+
+    updateEditor()
+
+
 })
 
 editorTextarea.addEventListener("input", e => {

@@ -31,8 +31,14 @@ const runSimpC = (function() {
             const c = chars.consume()
             assert(c.length === 1)
 
-            // TODO: support *, /, &, |, &&, ||, ^, etc
-            if (c === "+" || c === "(" || c === ")" || c === "-" || c === '=') {
+            if (c === '/' && chars.peek() === '/') {
+                while (!c.done() && c.peek() !== '\n') {
+                    // consume the rest of the line
+                    c.consume()
+                }
+                c.consume() // consume the '\n'
+            } if (c === "+" || c === "(" || c === ")" || c === "-" || c === '=') {
+                // TODO: support *, /, &, |, &&, ||, ^, etc
                 tokens.push({
                     type: 'operator',
                     value: c,
@@ -64,7 +70,7 @@ const runSimpC = (function() {
                     type: 'semicolon',
                     value: ';'
                 })
-                if (chars.done()) {
+                if (!chars.done()) {
                     console.error(`line: '${line}'`)
                     throw new Error(`nothing should come after ;`)
                 }
@@ -83,18 +89,32 @@ const runSimpC = (function() {
         )
     }
 
+    const noeol = tokenline => {
+        if (tokenline.done()) {
+            throw new Error("CompileError: unexpcected end of line")
+        }
+    }
+
     return (line, memory) => {
         // the kind of lines we can get
         //   int a = 10;
         //   a = a + 20;
         //   int p = &a;
 
+        console.log('running', line)
+        line = line.trim()
+
         const tokenline = parseTokens(line)
+        if (tokenline.done()) {
+            return false;
+        }
+
         const first = tokenline.consume()
         if (first.type !== 'word') {
             console.error(token)
             throw new Error("SyntaxError: invalid first token")
         }
+
         if (istype(first.value)) {
             // declare new variable
             // int a = 10;
@@ -103,16 +123,21 @@ const runSimpC = (function() {
                 tokeline.consume()
                 type = first.value + '*'
             }
+            noeol(tokenline)
+
             const identifier = tokenline.consume()
             if (identifier.type !== "word") {
                 console.error(identifier)
                 throw new Error("SyntaxError: expected identifer (type word)")
             }
+
+            noeol(tokenline)
             const equal = tokenline.consume()
             if (equal.type === 'semicolon') {
                 assert(tokenline.done())
                 return
             }
+            noeol(tokenline)
 
             if (equal.type !== "operator" || equal.value !== "=") {
                 console.error(equal)
@@ -120,6 +145,8 @@ const runSimpC = (function() {
             }
             const value = parseExpr(tokenline)
             memory.initialize(identifier, type, value)
+            return true
         }
+        assert(false)
     }
 })();
