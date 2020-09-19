@@ -39,21 +39,17 @@ class Memory {
             throw new Error("RuntimeError: out of memory")
         }
 
-        if (type === 'int') {
-            this.memory[identifier] = {
-                bytes: this._getIntBytes(typedvalue),
-            }
-        } else {
-            assert(false)
+        this.memory[identifier] = {
+            typedvalue:  typedvalue,
+            position: this.stackpointer
         }
-
-        this.memory[identifier].typedvalue = typedvalue
-        this.memory[identifier].position = this.stackpointer
 
         this.stackpointer += typesSize[type]
 
-        // update the visualization
+        this._updateVisualization(identifier)
+    }
 
+    _updateVisualization(identifier) {
         const x = this.memory[identifier].position % BYTES_PER_ROW
         const y = (this.memory[identifier].position - x) / BYTES_PER_ROW
 
@@ -70,14 +66,23 @@ class Memory {
         }
         assert(cell !== null)
 
-        const description = document.createElement('span')
-        description.classList.add("memory-description")
-        const repr = this.getRepr(typedvalue)
-        description.textContent = `${type} ${identifier} = ${repr}`
+        let description = cell.querySelector(".memory-description")
+        if (description === null) {
+            description = document.createElement('span')
+            description.classList.add("memory-description")
+            cell.appendChild(description)
+        }
 
-        cell.appendChild(description)
-        const bytes = this.memory[identifier].bytes
-        assert(bytes !== undefined)
+        const typedvalue = this.memory[identifier].typedvalue
+        const repr = this.getRepr(typedvalue)
+        description.textContent = `${typedvalue.type} ${identifier} = ${repr}`
+
+        let bytes
+        if (typedvalue.type === "int") {
+            bytes = this._getIntBytes(typedvalue)
+        } else {
+            assert(false)
+        }
 
         for (let i = 0; i < bytes.length; i++) {
             if (x + i === BYTES_PER_ROW) {
@@ -86,8 +91,15 @@ class Memory {
                 cell = row.firstElementChild.nextElementSibling
             }
             assert(cell !== null)
-            const textNode = document.createTextNode(bytes[i])
-            cell.appendChild(textNode)
+
+            let byte = cell.querySelector(".byte")
+            if (byte === null) {
+                byte = document.createElement('span')
+                byte.classList.add('byte')
+                cell.appendChild(byte)
+            }
+            byte.textContent = bytes[i]
+
             cell = cell.nextElementSibling
         }
     }
@@ -180,7 +192,7 @@ class Memory {
         const old = this.getTypedValue(identifier)
         assert(old.type === typedvalue.type)
         this.memory[identifier].typedvalue = typedvalue
-        throw new Error('update visualization')
+        this._updateVisualization(identifier)
     }
 
 }

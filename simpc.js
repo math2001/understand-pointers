@@ -189,6 +189,7 @@ const evalSimpC = (function() {
                 throw new Error(`mismatching type: variable is ${old.type}, expression is ${typedvalue.value}`)
             }
             memory.setTypedValue(first.value, typedvalue)
+            return true
         }
 
         assert(false)
