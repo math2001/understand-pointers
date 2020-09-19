@@ -44,24 +44,10 @@ const evalSimpC = (function() {
                 c.consume() // consume the '\n'
             } if (c === "+" || c === "(" || c === ")" || c === "-" || c === '=' || c === "*" || c === "/") {
                 // TODO: support *, /, &, |, &&, ||, ^, etc
-                if (c === '-') {
-                    while (!chars.done() && chars.peek() === ' ') {
-                        chars.consume()
-                    }
-                    if (!chars.done() && isdigit(chars.peek())) {
-                        negativeNumber = true
-                    } else {
-                        token.push({
-                            type: 'operator',
-                            value: '-'
-                        })
-                    }
-                } else {
-                    tokens.push({
-                        type: 'operator',
-                        value: c,
-                    })
-                }
+                tokens.push({
+                    type: 'operator',
+                    value: c,
+                })
             } else if (isdigit(c)) {
                 buffer.push(c)
                 while (!chars.done() && isdigit(chars.peek())) {
@@ -119,20 +105,15 @@ const evalSimpC = (function() {
     }
 
     const evalExpr = (tokenline, memory) => {
-        const buffer = []
         noeol(tokenline, "expected expression")
-        if (tokenline.peek().type === "number" || tokenline.peek().type === "word") {
-            const tree = buildExpressionTree(tokenline)
-            const typedvalue = evalExpressionTree(tree, memory)
+        const tree = buildExpressionTree(tokenline)
+        const typedvalue = evalExpressionTree(tree, memory)
 
-            noeol(tokenline, "forgot semicolon")
-            const semicolon = tokenline.consume()
-            assert(semicolon.type === "semicolon")
+        noeol(tokenline, "forgot semicolon")
+        const semicolon = tokenline.consume()
+        assert(semicolon.type === "semicolon")
 
-            return typedvalue
-        } else {
-            assert(false)
-        }
+        return typedvalue
     }
 
     return (line, memory) => {

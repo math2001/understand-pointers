@@ -16,6 +16,20 @@ const buildExpressionTree = (function () {
     const nud = tokenline => {
         assert(!tokenline.done())
         const token = tokenline.consume()
+        if (token.type === 'operator' && token.value === "-") {
+            if (reachedEnd(tokenline)) {
+                throw new Error("unexpected end of expression")
+            }
+            const number = tokenline.consume()
+            if (number.type !== "number") {
+                throw new Error("expected number of negative sign")
+            }
+
+            return {
+                type: 'number',
+                value: -1 * number.value
+            }
+        }
         assert(token.type === "number" || token.type === "word")
         return token
     }
