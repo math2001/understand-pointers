@@ -22,6 +22,7 @@ class Memory {
     }
 
     initialize(identifier, type, value) {
+        console.info('initializing memory', identifier, type, value)
         if (typesSize[type] === undefined) {
             throw new Error(`CompileError: unknown type ${type}`)
         }
@@ -83,6 +84,7 @@ class Memory {
 
         cell.appendChild(description)
         const bytes = this.memory[this.identifiertable[identifier]].bytes
+        assert(bytes !== undefined)
         for (let i = 0; i < bytes.length; i++) {
             if (x + i === bytesperrow) {
                 row = row.nextElementSibling
@@ -94,6 +96,26 @@ class Memory {
             cell.appendChild(textNode)
             cell = cell.nextElementSibling
         }
+    }
+
+    clear() {
+        let row = this.table.firstElementChild
+        while (row !== null) {
+            // we skip the address cell
+            let cell = row.firstElementChild.nextElementSibling
+            while (cell !== null) {
+                cell.innerHTML = ''
+                cell = cell.nextElementSibling
+            }
+            row = row.nextElementSibling
+        }
+        for (let i = 0; i < this.memory.length; i++) {
+            delete this.memory[i]
+        }
+        for (let key in this.identifiertable) {
+            delete this.identifiertable[key]
+        }
+        this.stackpointer = 1
     }
 
     _getPointerBytes(value) {
@@ -108,7 +130,10 @@ class Memory {
     }
 
     _getIntBytes(value) {
-        throw new Error("how does 2 complement work?")
+        assert(typeof value === "number")
+        assert(value <= 127)
+        assert(value >= -128)
+        return ["0x" + value.toString(16).padStart(4, "0")]
     }
 
     repr(type, value) {
@@ -119,11 +144,14 @@ class Memory {
         } else if (type === "char") {
             return JSON.stringify(value)
         } else if (type[type.length - 1] === "*") {
-            return '0x' + value.toString(16).padStart(4)
+            return '0x' + value.toString(16).padStart(4, "0")
         }
+
         console.error(`type: ${type} value:`, value)
         assert(false)
     }
+
+
 }
 
 const getMemoryTableRow = (rownum, bytesperrow) => {
@@ -161,15 +189,35 @@ const updateEditor = () => {
     html = html.slice(0, start) + '<span class="cursor"></span>' + html.slice(start)
 
     const lines = html.split('\n')
-    assert(activeLineIndex < lines.length)
-    for (let i = 0; i < lines.length; i++) {
-        if (i === activeLineIndex) {
-            lines[i] = '<span class="highlight line">' + lines[i] + '</span>'
+    assert(activeLineIndex <= lines.length)
+
+    if (activeLineIndex < lines.length) {
+        for (let i = 0; i < lines.length; i++) {
+            if (i === activeLineIndex) {
+                lines[i] = '<span class="highlight line">' + lines[i] + '</span>'
+            }
         }
     }
+
     html = lines.join('<br/>')
 
     editorView.innerHTML = html
+}
+
+const resetExecution = () => {
+    sourcecode = editorTextarea.value
+    activeLineIndex = -1
+    memory.clear()
+}
+
+const runSimpC = (line, memory) => {
+    try {
+        return evalSimpC(line, memory)
+    } catch (e) {
+        console.error(`line: '${line}'`)
+        console.error(e)
+        return true // just ran a meaningful line (stop execution)
+    }
 }
 
 runlineButton.addEventListener("click", e => {
@@ -178,6 +226,8 @@ runlineButton.addEventListener("click", e => {
     activeLineIndex++
     const lines = sourcecode.split('\n')
     if (activeLineIndex >= lines.length) {
+        activeLineIndex = lines.length - 1
+        console.warn("no more lines to run")
         return
     }
 
@@ -187,14 +237,10 @@ runlineButton.addEventListener("click", e => {
     }
 
     updateEditor()
-
-
 })
 
 editorTextarea.addEventListener("input", e => {
-    sourcecode = editorTextarea.value
-    activeLineIndex = -1
-
+    resetExecution()
     updateEditor()
 })
 

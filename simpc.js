@@ -1,4 +1,4 @@
-const runSimpC = (function() {
+const evalSimpC = (function() {
     const types = ['int', 'char']
 
     class TokenStream {
@@ -7,11 +7,15 @@ const runSimpC = (function() {
             this.i = 0
         }
         consume() {
-            assert(!this.done())
+            if (this.done()) {
+                throw new Error("no more tokens")
+            }
             return this.tokens[this.i++]
         }
         peek() {
-            assert(!this.done())
+            if (this.done()) {
+                throw new Error("no more tokens")
+            }
             return this.tokens[this.i]
         }
         done() {
@@ -45,17 +49,17 @@ const runSimpC = (function() {
                 })
             } else if (isdigit(c)) {
                 buffer.push(c)
-                while (isdigit(chars.peek())) {
+                while (!chars.done() && isdigit(chars.peek())) {
                     buffer.push(chars.consume())
                 }
                 tokens.push({
                     type: 'number',
-                    value: parseInt(buffer.join(''), 10)
+                    value: parseInt(buffer.join(''))
                 })
                 buffer.length = 0 // clear the buffer
             } else if (isletter(c)) {
                 buffer.push(c)
-                while (isletter(chars.peek()) || isdigit(chars.peek())) {
+                while (!chars.done() && (isletter(chars.peek()) || isdigit(chars.peek()))) {
                     buffer.push(chars.consume())
                 }
                 tokens.push({
@@ -89,9 +93,28 @@ const runSimpC = (function() {
         )
     }
 
-    const noeol = tokenline => {
+    const noeol = (tokenline, hint) => {
         if (tokenline.done()) {
-            throw new Error("CompileError: unexpcected end of line")
+            if (hint !== undefined) {
+                console.error("hint:", hint)
+            }
+            throw new Error("CompileError: unexpected end of line")
+        }
+    }
+
+    const evalExpr = tokenline => {
+        const buffer = []
+        noeol(tokenline, "expected expression")
+        while (tokenline.peek().type !== 'semicolon') {
+            if (tokenline.peek().type === "number") {
+                const number = tokenline.consume()
+                noeol(tokenline, "forgot semicolon")
+                // FIXME: support actual expression with + and stuff!
+                assert(tokenline.peek().type === 'semicolon')
+                return number.value
+            } else {
+                assert(false)
+            }
         }
     }
 
@@ -101,7 +124,7 @@ const runSimpC = (function() {
         //   a = a + 20;
         //   int p = &a;
 
-        console.log('running', line)
+        console.info('running', line)
         line = line.trim()
 
         const tokenline = parseTokens(line)
@@ -120,7 +143,7 @@ const runSimpC = (function() {
             // int a = 10;
             let type = first.value;
             if (tokenline.peek().type === 'operator' && tokenline.peek().value === "*") {
-                tokeline.consume()
+                tokenline.consume()
                 type = first.value + '*'
             }
             noeol(tokenline)
@@ -143,8 +166,8 @@ const runSimpC = (function() {
                 console.error(equal)
                 throw new Error("SyntaxError: expected equal token")
             }
-            const value = parseExpr(tokenline)
-            memory.initialize(identifier, type, value)
+            const value = evalExpr(tokenline)
+            memory.initialize(identifier.value, type, value)
             return true
         }
         assert(false)
