@@ -16,7 +16,9 @@ const buildExpressionTree = (function () {
     const nud = tokenline => {
         assert(!tokenline.done())
         const token = tokenline.consume()
-        if (token.type === 'operator' && token.value === "-") {
+        if (token.type === "bracket" && token.value === "(") {
+            return parseExpr(tokenline, 0)
+        } if (token.type === 'operator' && token.value === "-") {
             if (reachedEnd(tokenline)) {
                 throw new Error("unexpected end of expression")
             }
@@ -54,9 +56,18 @@ const buildExpressionTree = (function () {
 
     const parseExpr = (tokenline, bindingpower) => {
         let left = nud(tokenline)
-        while (!reachedEnd(tokenline) && getBindingPower(tokenline.peek().value) > bindingpower) {
+        while (
+            !reachedEnd(tokenline) &&
+            !(tokenline.peek().type === "bracket" && tokenline.peek().value === ")") &&
+            getBindingPower(tokenline.peek().value) > bindingpower) {
+
             left = led(left, tokenline)
         }
+
+        if (!reachedEnd(tokenline) && tokenline.peek().type === "bracket" && tokenline.peek().value === ")") {
+            tokenline.consume()
+        }
+
         return left
     }
 

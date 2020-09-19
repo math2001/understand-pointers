@@ -27,7 +27,7 @@ const evalSimpC = (function() {
 
     const parseTokens = (line) => {
         const chars = new TokenStream(line)
-        // token types: word, number, operator
+        // token types: word, number, operator, bracket
 
         let negativeNumber = false;
         const tokens = []
@@ -42,10 +42,15 @@ const evalSimpC = (function() {
                     c.consume()
                 }
                 c.consume() // consume the '\n'
-            } if (c === "+" || c === "(" || c === ")" || c === "-" || c === '=' || c === "*" || c === "/") {
+            } if (c === "+" || c === "-" || c === '=' || c === "*" || c === "/") {
                 // TODO: support *, /, &, |, &&, ||, ^, etc
                 tokens.push({
                     type: 'operator',
+                    value: c,
+                })
+            } else if (c === "(" || c === ")") {
+                tokens.push({
+                    type: 'bracket',
                     value: c,
                 })
             } else if (isdigit(c)) {
@@ -85,6 +90,7 @@ const evalSimpC = (function() {
                 throw new Error(`unknown char '${c}'`)
             }
         }
+
         return new TokenStream(tokens)
     }
 
