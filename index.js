@@ -1,6 +1,7 @@
 document.addEventListener("DOMContentLoaded", _ => {
-const bytesperrow = 4
-const numrows = 10
+const BYTES_PER_ROW = 4
+const NUM_ROWS = 10
+const MEMORY_SIZE = NUM_ROWS * BYTES_PER_ROW
 
 const typesSize = {
     'int': 2,
@@ -9,16 +10,18 @@ const typesSize = {
 const pointersSize = 1
 
 class Memory {
-    constructor(memsize, tableElement) {
-        assert(memsize > 0)
+    constructor(tableElement) {
         assert(tableElement instanceof HTMLElement)
 
         this.table = tableElement
-        // addr: memory object
-        this.memory = new Array(memsize)
+        // variable: memory object
+        this.memory = {}
         this.stackpointer = 1
-        // identifier: addr
-        this.identifiertable = {}
+
+        for (let i = 0; i < NUM_ROWS; i++) {
+            const row = getMemoryTableRow(i, BYTES_PER_ROW)
+            memoryTable.appendChild(row)
+        }
     }
 
     initialize(identifier, type, typedvalue) {
@@ -29,43 +32,30 @@ class Memory {
         if (typesSize[type] === undefined) {
             throw new Error(`CompileError: unknown type ${type}`)
         }
-        if (this.identifiertable[identifier] !== undefined) {
+        if (this.memory[identifier] !== undefined) {
             throw new Error(`CompileError: ${identifier} already declared`)
         }
         if (this.stackpointer + typesSize[type] > this.memory.length) {
             throw new Error("RuntimeError: out of memory")
         }
 
-        this.identifiertable[identifier] = this.stackpointer
-
-        if (type[type.length - 1] === '*') {
-            this.stackpointer += pointersSize
-            this.memory[this.identifiertable[identifier]] = {
-                type: type,
-                bytes: this._getPointerBytes(typedvalue)
-            }
-            return
-        }
-        this.stackpointer += typesSize[type]
-
         if (type === 'int') {
-            this.memory[this.identifiertable[identifier]] = {
+            this.memory[identifier] = {
                 bytes: this._getIntBytes(typedvalue),
-            }
-        } else if (type === 'char') {
-            this.memory[this.identifiertable[identifier]] = {
-                bytes: this._getCharBytes(typedvalue),
             }
         } else {
             assert(false)
         }
 
-        this.memory[this.identifiertable[identifier]].typedvalue = typedvalue
+        this.memory[identifier].typedvalue = typedvalue
+        this.memory[identifier].position = this.stackpointer
+
+        this.stackpointer += typesSize[type]
 
         // update the visualization
 
-        const x = this.identifiertable[identifier] % bytesperrow
-        const y = (this.identifiertable[identifier] - x) / bytesperrow
+        const x = this.memory[identifier].position % BYTES_PER_ROW
+        const y = (this.memory[identifier].position - x) / BYTES_PER_ROW
 
         let row = this.table.firstElementChild
         for (let i = 0; i < y; i++) {
@@ -86,10 +76,11 @@ class Memory {
         description.textContent = `${type} ${identifier} = ${repr}`
 
         cell.appendChild(description)
-        const bytes = this.memory[this.identifiertable[identifier]].bytes
+        const bytes = this.memory[identifier].bytes
         assert(bytes !== undefined)
+
         for (let i = 0; i < bytes.length; i++) {
-            if (x + i === bytesperrow) {
+            if (x + i === BYTES_PER_ROW) {
                 row = row.nextElementSibling
                 assert(row !== null)
                 cell = row.firstElementChild.nextElementSibling
@@ -114,9 +105,6 @@ class Memory {
         }
         for (let i = 0; i < this.memory.length; i++) {
             delete this.memory[i]
-        }
-        for (let key in this.identifiertable) {
-            delete this.identifiertable[key]
         }
         this.stackpointer = 1
     }
@@ -180,24 +168,30 @@ class Memory {
     }
 
     hasIdentifier(identifier) {
-        return this.identifiertable[identifier] !== undefined
+        return this.memory[identifier] !== undefined
     }
 
     getTypedValue(identifier) {
         assert(this.hasIdentifier(identifier))
-        return this.memory[this.identifiertable[identifier]].typedvalue
+        return this.memory[identifier].typedvalue
     }
 
+    setTypedValue(identifier, typedvalue) {
+        const old = this.getTypedValue(identifier)
+        assert(old.type === typedvalue.type)
+        this.memory[identifier].typedvalue = typedvalue
+        throw new Error('update visualization')
+    }
 
 }
 
-const getMemoryTableRow = (rownum, bytesperrow) => {
+const getMemoryTableRow = (rownum, BYTES_PER_ROW) => {
     const row = document.createElement('tr')
     const addr = document.createElement('th')
-    addr.textContent = "0x" + (rownum * bytesperrow).toString(16).padStart(3, '0')
+    addr.textContent = "0x" + (rownum * BYTES_PER_ROW).toString(16).padStart(3, '0')
     row.appendChild(addr)
 
-    for (let i = 0; i < bytesperrow; i++) {
+    for (let i = 0; i < BYTES_PER_ROW; i++) {
         const cell = document.createElement('td')
         row.appendChild(cell)
     }
@@ -301,15 +295,11 @@ updateEditor()
 
 editor.focus()
 
-for (let i = 0; i < numrows; i++) {
-    const row = getMemoryTableRow(i, bytesperrow)
-    memoryTable.appendChild(row)
-}
+const memory = new Memory(memoryTable)
 
 memoryView.innerHTML = ''
 memoryView.appendChild(memoryTable)
 
-const memory = new Memory(numrows * bytesperrow, memoryTable)
 // memory.initialize('var1', 'char', 'a')
 // memory.initialize('var2', 'char', 'b')
 // memory.initialize('var3', 'char', 'c')

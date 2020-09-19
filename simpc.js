@@ -1,5 +1,4 @@
 const evalSimpC = (function() {
-    const types = ['int', 'char']
 
     class TokenStream {
         constructor(tokens) {
@@ -180,7 +179,7 @@ const evalSimpC = (function() {
             const equal = tokenline.consume()
             assert(equal.type === "operator")
             assert(equal.value === "=")
-            if (!memory.hasIdentifer(first.value)) {
+            if (!memory.hasIdentifier(first.value)) {
                 throw new Error(`unknown variable ${first.value}`)
             }
 
