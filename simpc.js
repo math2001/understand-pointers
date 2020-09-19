@@ -42,7 +42,7 @@ const evalSimpC = (function() {
                     c.consume()
                 }
                 c.consume() // consume the '\n'
-            } if (c === "+" || c === "(" || c === ")" || c === "-" || c === '=') {
+            } if (c === "+" || c === "(" || c === ")" || c === "-" || c === '=' || c === "*" || c === "/") {
                 // TODO: support *, /, &, |, &&, ||, ^, etc
                 if (c === '-') {
                     while (!chars.done() && chars.peek() === ' ') {
@@ -118,19 +118,20 @@ const evalSimpC = (function() {
         }
     }
 
-    const evalExpr = tokenline => {
+    const evalExpr = (tokenline, memory) => {
         const buffer = []
         noeol(tokenline, "expected expression")
-        while (tokenline.peek().type !== 'semicolon') {
-            if (tokenline.peek().type === "number") {
-                const number = tokenline.consume()
-                noeol(tokenline, "forgot semicolon")
-                // FIXME: support actual expression with + and stuff!
-                assert(tokenline.peek().type === 'semicolon')
-                return number.value
-            } else {
-                assert(false)
-            }
+        if (tokenline.peek().type === "number" || tokenline.peek().type === "word") {
+            const tree = buildExpressionTree(tokenline)
+            const typedvalue = evalExpressionTree(tree, memory)
+
+            noeol(tokenline, "forgot semicolon")
+            const semicolon = tokenline.consume()
+            assert(semicolon.type === "semicolon")
+
+            return typedvalue
+        } else {
+            assert(false)
         }
     }
 
@@ -182,8 +183,8 @@ const evalSimpC = (function() {
                 console.error(equal)
                 throw new Error("SyntaxError: expected equal token")
             }
-            const value = evalExpr(tokenline)
-            memory.initialize(identifier.value, type, value)
+            const typedvalue = evalExpr(tokenline, memory)
+            memory.initialize(identifier.value, type, typedvalue)
             return true
         }
         assert(false)

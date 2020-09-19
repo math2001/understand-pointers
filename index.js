@@ -21,8 +21,12 @@ class Memory {
         this.identifiertable = {}
     }
 
-    initialize(identifier, type, value) {
-        console.info('initializing memory', identifier, type, value)
+    initialize(identifier, type, typedvalue) {
+        console.info('initializing memory', identifier, type, typedvalue)
+        if (type !== typedvalue.type) {
+            console.error(`type: ${type}, typedvalue:`, typedvalue)
+            throw new Error("dismatching type")
+        }
         if (typesSize[type] === undefined) {
             throw new Error(`CompileError: unknown type ${type}`)
         }
@@ -39,7 +43,7 @@ class Memory {
             this.stackpointer += pointersSize
             this.memory[this.identifiertable[identifier]] = {
                 type: type,
-                bytes: this._getPointerBytes(value)
+                bytes: this._getPointerBytes(typedvalue)
             }
             return
         }
@@ -48,12 +52,12 @@ class Memory {
         if (type === 'int') {
             this.memory[this.identifiertable[identifier]] = {
                 type: 'int',
-                bytes: this._getIntBytes(value),
+                bytes: this._getIntBytes(typedvalue),
             }
         } else if (type === 'char') {
             this.memory[this.identifiertable[identifier]] = {
                 type: 'int',
-                bytes: this._getCharBytes(value),
+                bytes: this._getCharBytes(typedvalue),
             }
         } else {
             assert(false)
@@ -79,7 +83,7 @@ class Memory {
 
         const description = document.createElement('span')
         description.classList.add("memory-description")
-        const repr = this.repr(type, value)
+        const repr = this.getRepr(typedvalue)
         description.textContent = `${type} ${identifier} = ${repr}`
 
         cell.appendChild(description)
@@ -129,16 +133,21 @@ class Memory {
         return [value.charCodeAt(0).toString(2)]
     }
 
-    _getIntBytes(value) {
-        assert(typeof value === "number")
-        assert(value <= 1 << (8 * typesSize['int'] - 1) - 1)
-        assert(value >= -(1 << (8 * typesSize['int'] - 1)))
+    _getIntBytes(typedvalue) {
+        assert(typedvalue !== undefined)
+        assert(typedvalue.type === "int")
+        assert(typeof typedvalue.value === "number")
+
+        assert(typedvalue.value <= 1 << (8 * typesSize['int'] - 1) - 1)
+        assert(typedvalue.value >= -(1 << (8 * typesSize['int'] - 1)))
+
         let bits;
-        if (value >= 0) {
-            bits = value.toString(2)
+        if (typedvalue.value >= 0) {
+            bits = typedvalue.value.toString(2)
         } else {
-            bits = ((1 << (8 * typesSize['int'])) + value).toString(2)
+            bits = ((1 << (8 * typesSize['int'])) + typedvalue.value).toString(2)
         }
+
         bits = bits.padStart(8 * typesSize['int'], "0")
         const bytes = []
         for (let i = 0; i < typesSize['int']; i++) {
@@ -147,14 +156,23 @@ class Memory {
         return bytes
     }
 
-    repr(type, value) {
-        assert(typeof type === "string")
-        assert(typesSize[type] !== undefined)
-        if (type === "int") {
-            return value
-        } else if (type === "char") {
-            return JSON.stringify(value)
-        } else if (type[type.length - 1] === "*") {
+    getRepr(typedvalue) {
+        assert(typedvalue !== undefined)
+        assert(typeof typedvalue.type === "string")
+        assert(
+            typesSize[typedvalue.type] !== undefined ||
+            (
+                typedvalue.type[type.length - 1] === "*" &&
+                typesSize[typedvalue.type.slice(0, -1)] !== undefined
+            )
+        )
+
+        if (typedvalue.type === "int") {
+            return typedvalue.value
+        } else if (typedvalue.type === "char") {
+            assert(typedvalue.value.length === 1)
+            return JSON.stringify(typedvalue.value)
+        } else if (typedvalue.type[type.length - 1] === "*") {
             return '0x' + value.toString(16).padStart(4, "0")
         }
 
