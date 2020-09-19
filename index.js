@@ -115,8 +115,8 @@ class Memory {
             }
             row = row.nextElementSibling
         }
-        for (let i = 0; i < this.memory.length; i++) {
-            delete this.memory[i]
+        for (let name in this.memory) {
+            delete this.memory[name]
         }
         this.stackpointer = 1
     }
