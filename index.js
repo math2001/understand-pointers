@@ -3,7 +3,7 @@ const bytesperrow = 4
 const numrows = 10
 
 const typesSize = {
-    'int': 4,
+    'int': 2,
     'char': 1,
 }
 const pointersSize = 1
@@ -131,9 +131,21 @@ class Memory {
 
     _getIntBytes(value) {
         assert(typeof value === "number")
-        assert(value <= 127)
-        assert(value >= -128)
-        return ["0x" + value.toString(16).padStart(4, "0")]
+        assert(value <= 1 << (8 * typesSize['int'] - 1) - 1)
+        assert(value >= -(1 << (8 * typesSize['int'] - 1)))
+        let bits;
+        if (value >= 0) {
+            bits = value.toString(2)
+        } else {
+            bits = (1 << (8 * typesSize['int']) - 1 + value)
+        }
+        bits = bits.padStart(8 * typesSize['int'], "0")
+        console.log(bits)
+        const bytes = []
+        for (let i = 0; i < typesSize['int']; i++) {
+            bytes.push(bits.slice(i * 8, (i + 1) * 8))
+        }
+        return bytes
     }
 
     repr(type, value) {
