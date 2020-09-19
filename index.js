@@ -2,12 +2,13 @@ document.addEventListener("DOMContentLoaded", _ => {
 const BYTES_PER_ROW = 4
 const NUM_ROWS = 10
 const MEMORY_SIZE = NUM_ROWS * BYTES_PER_ROW
+const POINTER_SIZE = 1
 
 const typesSize = {
     'int': 2,
     'char': 1,
+    'null-pointer': POINTER_SIZE
 }
-const pointersSize = 1
 
 class Memory {
     constructor(tableElement) {
@@ -25,13 +26,22 @@ class Memory {
     }
 
     initialize(identifier, type, typedvalue) {
+        if (type.endsWith("*") && typedvalue.type === "null-pointer") {
+            typedvalue.type = type
+        }
+
         if (type !== typedvalue.type) {
             console.error(`type: ${type}, typedvalue:`, typedvalue)
             throw new Error("mismatching type")
         }
-        if (typesSize[type] === undefined) {
+
+        if (
+            typesSize[type] === undefined &&
+            !(type.endsWith('*') && typesSize[type.slice(0, -1)] !== undefined)
+        ) {
             throw new Error(`CompileError: unknown type ${type}`)
         }
+
         if (this.memory[identifier] !== undefined) {
             throw new Error(`CompileError: ${identifier} already declared`)
         }
@@ -44,12 +54,21 @@ class Memory {
             position: this.stackpointer
         }
 
-        this.stackpointer += typesSize[type]
+        if (type.endsWith("*") && typesSize[type.slice(0, -1)] !== undefined) {
+            this.stackpointer += POINTER_SIZE
+        } else if (typesSize[type] !== undefined) {
+            this.stackpointer += typesSize[type]
+        } else {
+            console.error(type)
+            assert(false)
+        }
 
         this._updateVisualization(identifier)
     }
 
     _updateVisualization(identifier) {
+        assert(!isNaN(this.memory[identifier].position))
+
         const x = this.memory[identifier].position % BYTES_PER_ROW
         const y = (this.memory[identifier].position - x) / BYTES_PER_ROW
 
@@ -80,7 +99,14 @@ class Memory {
         let bytes
         if (typedvalue.type === "int") {
             bytes = this._getIntBytes(typedvalue)
+        } else if (typedvalue.type.endsWith("*")) {
+            if (typedvalue.value === null) {
+                bytes = ['0'.repeat(8)]
+            } else {
+                throw new Error("not implemented")
+            }
         } else {
+            console.error(typedvalue.type)
             assert(false)
         }
 
@@ -161,7 +187,7 @@ class Memory {
         assert(
             typesSize[typedvalue.type] !== undefined ||
             (
-                typedvalue.type[type.length - 1] === "*" &&
+                typedvalue.type[typedvalue.type.length - 1] === "*" &&
                 typesSize[typedvalue.type.slice(0, -1)] !== undefined
             )
         )
@@ -171,11 +197,14 @@ class Memory {
         } else if (typedvalue.type === "char") {
             assert(typedvalue.value.length === 1)
             return JSON.stringify(typedvalue.value)
-        } else if (typedvalue.type[type.length - 1] === "*") {
-            return '0x' + value.toString(16).padStart(4, "0")
+        } else if (typedvalue.type[typedvalue.type.length - 1] === "*") {
+            if (typedvalue.value === null) {
+                return 'NULL'
+            }
+            return '0x' + typedvalue.value.toString(16).padStart(4, "0")
         }
 
-        console.error(`type: ${type} value:`, value)
+        console.error(`type: ${typedvalue.type} value:`, typedvalue.value)
         assert(false)
     }
 

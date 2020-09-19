@@ -31,7 +31,13 @@ const buildExpressionTree = (function () {
                 type: 'number',
                 value: -1 * number.value
             }
+        } else if (token.type === "word" && token.value === "NULL") {
+            return {
+                type: "null-pointer",
+                value: null
+            }
         }
+
         assert(token.type === "number" || token.type === "word")
         return token
     }
@@ -101,6 +107,10 @@ const evalExpressionTree = (function() {
                 }
 
                 return memory.getTypedValue(node.value)
+            }
+
+            if (node.type === "null-pointer") {
+                return node
             }
 
             assert(node.type === "number")
