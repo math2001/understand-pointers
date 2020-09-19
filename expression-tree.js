@@ -85,8 +85,11 @@ const evalExpressionTree = (function() {
             // it's not a node, but an actual value
             if (node.type === "word") {
                 // identifier
-                assert(false)
-                return memory.get(node.value)
+                if (!memory.hasIdentifier(node.value)) {
+                    throw new Error(`unknown variable ${node.value}`)
+                }
+
+                return memory.getTypedValue(node.value)
             }
 
             assert(node.type === "number")

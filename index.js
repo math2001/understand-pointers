@@ -25,7 +25,7 @@ class Memory {
         console.info('initializing memory', identifier, type, typedvalue)
         if (type !== typedvalue.type) {
             console.error(`type: ${type}, typedvalue:`, typedvalue)
-            throw new Error("dismatching type")
+            throw new Error("mismatching type")
         }
         if (typesSize[type] === undefined) {
             throw new Error(`CompileError: unknown type ${type}`)
@@ -51,17 +51,17 @@ class Memory {
 
         if (type === 'int') {
             this.memory[this.identifiertable[identifier]] = {
-                type: 'int',
                 bytes: this._getIntBytes(typedvalue),
             }
         } else if (type === 'char') {
             this.memory[this.identifiertable[identifier]] = {
-                type: 'int',
                 bytes: this._getCharBytes(typedvalue),
             }
         } else {
             assert(false)
         }
+
+        this.memory[this.identifiertable[identifier]].typedvalue = typedvalue
 
         // update the visualization
 
@@ -178,6 +178,15 @@ class Memory {
 
         console.error(`type: ${type} value:`, value)
         assert(false)
+    }
+
+    hasIdentifier(identifier) {
+        return this.identifiertable[identifier] !== undefined
+    }
+
+    getTypedValue(identifier) {
+        assert(this.hasIdentifier(identifier))
+        return this.memory[this.identifiertable[identifier]].typedvalue
     }
 
 
