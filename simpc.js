@@ -173,6 +173,25 @@ const evalSimpC = (function() {
             memory.initialize(identifier.value, type, typedvalue)
             return true
         }
+
+        if (first.type === "word") {
+            noeol(tokenline, "a single isn't a valid statement")
+
+            const equal = tokenline.consume()
+            assert(equal.type === "operator")
+            assert(equal.value === "=")
+            if (!memory.hasIdentifer(first.value)) {
+                throw new Error(`unknown variable ${first.value}`)
+            }
+
+            const typedvalue = evalExpr(tokenline, memory)
+            const old = memory.getTypedValue(first.value)
+            if (old.type !== typedvalue.type) {
+                throw new Error(`mismatching type: variable is ${old.type}, expression is ${typedvalue.value}`)
+            }
+            memory.setTypedValue(first.value, typedvalue)
+        }
+
         assert(false)
     }
 })();
