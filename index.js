@@ -22,7 +22,6 @@ class Memory {
     }
 
     initialize(identifier, type, typedvalue) {
-        console.info('initializing memory', identifier, type, typedvalue)
         if (type !== typedvalue.type) {
             console.error(`type: ${type}, typedvalue:`, typedvalue)
             throw new Error("mismatching type")

@@ -107,7 +107,6 @@ const evalExpressionTree = (function() {
             // we could handle constants like go does, but i'm taking the easy
             // route here
             assert(isinteger(node.value))
-            console.log('return int', node.value)
             return {
                 type: 'int',
                 value: node.value

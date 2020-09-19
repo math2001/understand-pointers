@@ -128,7 +128,6 @@ const evalSimpC = (function() {
         //   a = a + 20;
         //   int p = &a;
 
-        console.info('running', line)
         line = line.trim()
 
         const tokenline = parseTokens(line)
