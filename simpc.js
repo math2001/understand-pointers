@@ -29,6 +29,7 @@ const evalSimpC = (function() {
         const chars = new TokenStream(line)
         // token types: word, number, operator
 
+        let negativeNumber = false;
         const tokens = []
         const buffer = []
         while (!chars.done()) {
@@ -43,10 +44,24 @@ const evalSimpC = (function() {
                 c.consume() // consume the '\n'
             } if (c === "+" || c === "(" || c === ")" || c === "-" || c === '=') {
                 // TODO: support *, /, &, |, &&, ||, ^, etc
-                tokens.push({
-                    type: 'operator',
-                    value: c,
-                })
+                if (c === '-') {
+                    while (!chars.done() && chars.peek() === ' ') {
+                        chars.consume()
+                    }
+                    if (!chars.done() && isdigit(chars.peek())) {
+                        negativeNumber = true
+                    } else {
+                        token.push({
+                            type: 'operator',
+                            value: '-'
+                        })
+                    }
+                } else {
+                    tokens.push({
+                        type: 'operator',
+                        value: c,
+                    })
+                }
             } else if (isdigit(c)) {
                 buffer.push(c)
                 while (!chars.done() && isdigit(chars.peek())) {
@@ -54,9 +69,10 @@ const evalSimpC = (function() {
                 }
                 tokens.push({
                     type: 'number',
-                    value: parseInt(buffer.join(''))
+                    value: parseInt(buffer.join('')) * (negativeNumber ? -1 : 1)
                 })
                 buffer.length = 0 // clear the buffer
+                negativeNumber = false
             } else if (isletter(c)) {
                 buffer.push(c)
                 while (!chars.done() && (isletter(chars.peek()) || isdigit(chars.peek()))) {
