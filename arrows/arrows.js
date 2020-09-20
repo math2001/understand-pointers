@@ -69,6 +69,81 @@ return {
         to.style.top = pointTo.y - (POINT_SIZE / 2) + 'px'
         document.body.appendChild(from)
         document.body.appendChild(to)
+
+
+        const horizontalDistance = Math.abs(pointFrom.x - pointTo.x)
+        const verticalDistance = Math.abs(pointFrom.y - pointTo.y)
+
+        // create a new svg element
+        const svg = document.createElementNS(XMLNS, "svg")
+        svg.setAttributeNS(null, "viewbox", `0 0 ${horizontalDistance} ${verticalDistance}`)
+        svg.setAttributeNS(null, "width", horizontalDistance)
+        svg.setAttributeNS(null, "height", verticalDistance)
+
+        const topleft = {
+            x: Math.min(pointFrom.x, pointTo.x),
+            y: Math.min(pointFrom.y, pointTo.y)
+        }
+
+        svg.classList.add('svg-arrow')
+        svg.style.left = topleft.x + 'px'
+        svg.style.top = topleft.y + 'px'
+
+        // set it from JavaScript because otherwise nothing works, and I've got
+        // a feeling this would be a source of headache
+        svg.style.overflow = "visible"
+
+        const path = document.createElementNS(XMLNS, "path")
+        path.setAttributeNS(null, "fill", "none")
+        path.setAttributeNS(null, "stroke", "red")
+
+        const svgFrom = {
+            x: pointFrom.x - topleft.x,
+            y: pointFrom.y - topleft.y
+        }
+        const svgTo = {
+            x: pointTo.x - topleft.x,
+            y: pointTo.y - topleft.y
+        }
+        if (
+            (pointFrom.x === recta.left || pointFrom.x === recta.right) &&
+            (pointTo.x === rectb.left || pointTo.x === rectb.right)
+        ) {
+            path.setAttributeNS(null, "d", `
+                M ${svgFrom.x},${svgFrom.y}
+                l ${(svgTo.x - svgFrom.x) / 2},0
+                l 0,${(svgTo.y - svgFrom.y)}
+                L ${svgTo.x},${svgTo.y}
+            `)
+        } else if (
+            (pointFrom.y === recta.top || pointFrom.y === recta.bottom) &&
+            (pointTo.y === rectb.top || pointTo.y === rectb.bottom)
+        ) {
+            path.setAttributeNS(null, "d", `
+                M ${svgFrom.x},${svgFrom.y}
+                l 0,${(svgTo.y - svgFrom.y) / 2}
+                l ${svgTo.x - svgFrom.x},0
+                L ${svgTo.x},${svgTo.y}
+            `)
+        } else if (pointFrom.y === recta.top || pointFrom.y === recta.bottom) {
+            path.setAttributeNS(null, "d", `
+                M ${svgFrom.x},${svgFrom.y}
+                l 0,${svgTo.y - svgFrom.y}
+                L ${svgTo.x},${svgTo.y}
+            `)
+        } else if (pointFrom.x === recta.left || pointFrom.x === recta.right) {
+            path.setAttributeNS(null, "d", `
+                M ${svgFrom.x},${svgFrom.y}
+                l ${svgTo.x - svgFrom.x},0
+                L ${svgTo.x},${svgTo.y}
+            `)
+        } else {
+            console.error(pointFrom, pointTo)
+            throw new Error("unexpected case")
+        }
+
+        svg.appendChild(path)
+        document.body.appendChild(svg)
     },
 
     connectOld: (a, b) => {
