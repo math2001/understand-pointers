@@ -19,6 +19,15 @@
             justify-content: center;
             align-items: center;
             background-color: #ecf0f1;
+            user-select: none;
+        }
+
+        .point {
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            border-radius: 100%;
+            background-color: #e74c3c;
         }
 
         .box.dragged {
@@ -27,6 +36,8 @@
 
         #a {
             left: 200px;
+            width: 64px;
+            height: 64px;
         }
 
     </style>
@@ -41,7 +52,22 @@
     </div>
 
     <script src="draggable.js"></script>
-    <!-- <script src="arrows.js"></script> -->
+    <script src="arrows.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", _ => {
+            const a = document.querySelector("#a")
+            const b = document.querySelector("#b")
+            let arrow = arrows.connect(a, b);
+            // document.addEventListener("keydown", _ => {
+            //     if (arrow === null) {
+            //         arrow = arrows.connect(a, b)
+            //     } else {
+            //         arrows.update(arrow, a, b)
+            //     }
+            // })
+        })
+
+    </script>
 
 </body>
 </html>

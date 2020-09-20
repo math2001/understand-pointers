@@ -52,12 +52,11 @@ document.addEventListener("DOMContentLoaded", _ => {
     })
 
     let draggablesPosition = localStorage.getItem("draggables")
-    console.log(draggablesPosition)
     if (draggablesPosition) {
         draggablesPosition = JSON.parse(draggablesPosition)
         for (let id in draggablesPosition) {
             const element = document.getElementById(id)
-            console.log(element)
+            if (!element) continue
             element.style.left = draggablesPosition[id].left
             element.style.top = draggablesPosition[id].top
         }
