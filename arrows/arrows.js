@@ -82,11 +82,29 @@ return {
         svg.classList.add('svg-arrow')
         svg.style.left = pointFrom.x + 'px'
         svg.style.top = pointFrom.y + 'px'
+        // set it from JavaScript because otherwise nothing works, and I've got
+        // a feeling this would be a source of headache
+        svg.style.overflow = "visible"
 
         const path = document.createElementNS(XMLNS, "path")
         path.setAttributeNS(null, "fill", "none")
         path.setAttributeNS(null, "stroke", "red")
-        path.setAttributeNS(null, "d", `M 0,0 L ${totalDx},${totalDy}`)
+
+        if (horizontalDistance >= verticalDistance) {
+            path.setAttributeNS(null, "d", `
+                M 0,0
+                L ${totalDx / 2},0
+                L ${totalDx / 2},${totalDy}
+                L ${totalDx},${totalDy}
+            `)
+        } else {
+            path.setAttributeNS(null, "d", `
+                M 0,0
+                L 0,${totalDy / 2}
+                L ${totalDx},${totalDy / 2}
+                L ${totalDx},${totalDy}
+            `)
+        }
         svg.appendChild(path)
 
         document.body.appendChild(svg)
