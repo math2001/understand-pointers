@@ -87,8 +87,7 @@ class Arrow {
         this.svg.style.left = topleft.x + 'px'
         this.svg.style.top = topleft.y + 'px'
 
-        // set it from JavaScript because otherwise nothing works, and I've got
-        // a feeling this would be a source of headache
+        // for some reason, this prevents the svg from being blurry
         this.svg.style.overflow = "visible"
 
         this.path.setAttributeNS(null, "fill", "none")

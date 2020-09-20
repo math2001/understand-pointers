@@ -45,7 +45,7 @@
             transform: translate(0, 0);
         }
         .svg-arrow path {
-            stroke-width: 2px;
+            stroke-width: 4px;
             stroke: #e74c3c;
         }
 
@@ -73,14 +73,22 @@
         document.addEventListener("DOMContentLoaded", _ => {
             const a = document.querySelector("#a")
             const b = document.querySelector("#b")
+
             arrow = new Arrow()
             arrow.connect(a, b);
+
+            document.addEventListener('mousemove', e => {
+                if (arrow !== null)
+                    arrow.connect(a, b)
+            })
+
+            document.addEventListener('keydown', e => {
+                console.log(a, b)
+                if (arrow !== null)
+                    arrow.connect(a, b)
+            })
         })
 
-        document.addEventListener('keydown', e => {
-            if (arrow !== null)
-                arrow.connect(a, b)
-        })
 
     </script>
 
