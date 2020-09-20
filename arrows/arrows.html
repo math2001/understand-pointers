@@ -28,6 +28,7 @@
             height: 16px;
             border-radius: 100%;
             background-color: #e74c3c;
+            z-index: 2;
         }
 
         .box.dragged {
@@ -38,6 +39,10 @@
             position: absolute;
             top: 0;
             left: 0;
+            /* make sure the svg is pixel perfect (transform aligns things
+            on the raster grid*/
+            /* not 100% sure if that actually does anything*/
+            transform: translate(0, 0);
         }
         .svg-arrow path {
             stroke-width: 2px;
@@ -64,23 +69,17 @@
     <script src="draggable.js"></script>
     <script src="arrows.js"></script>
     <script>
+        let arrow = null;
         document.addEventListener("DOMContentLoaded", _ => {
             const a = document.querySelector("#a")
             const b = document.querySelector("#b")
-            let arrow = arrows.connect(a, b);
-            // document.addEventListener("keydown", _ => {
-            //     if (arrow === null) {
-            //         arrow = arrows.connect(a, b)
-            //     } else {
-            //         arrows.update(arrow, a, b)
-            //     }
-            // })
+            arrow = new Arrow()
+            arrow.connect(a, b);
         })
 
         document.addEventListener('keydown', e => {
-            if (e.key === ' ') {
-                location.reload()
-            }
+            if (arrow !== null)
+                arrow.connect(a, b)
         })
 
     </script>
