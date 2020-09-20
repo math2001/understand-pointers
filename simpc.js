@@ -193,7 +193,7 @@ const evalSimpC = (function() {
             const typedvalue = evalExpr(tokenline, memory)
             const old = memory.getTypedValue(first.value)
             if (old.type !== typedvalue.type) {
-                throw new Error(`mismatching type: variable is ${old.type}, expression is ${typedvalue.value}`)
+                throw new Error(`mismatching type: variable is ${old.type}, expression is ${typedvalue.type} (${typedvalue.value})`)
             }
             memory.setTypedValue(first.value, typedvalue)
             return true
