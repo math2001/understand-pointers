@@ -15,12 +15,13 @@ const buildExpressionTree = (function () {
 
     const nud = tokenline => {
         assert(!tokenline.done())
+
         const token = tokenline.consume()
         if (token.type === "bracket" && token.value === "(") {
             return parseExpr(tokenline, 0)
         } if (token.type === 'operator' && token.value === "-") {
             if (reachedEnd(tokenline)) {
-                throw new Error("unexpected end of expression")
+                throw new Error("unexpected end of expression after -")
             }
             const number = tokenline.consume()
             if (number.type !== "number") {
@@ -35,6 +36,20 @@ const buildExpressionTree = (function () {
             return {
                 type: "null-pointer",
                 value: null
+            }
+        } else if (token.type === "operator" && token.value === "&") {
+            if (reachedEnd(tokenline)) {
+                throw new Error("unexpected end of expression after &")
+            }
+
+            const variable = tokenline.consume()
+            if (variable.type !== "word") {
+                throw new Error("expected variable name after &")
+            }
+
+            return {
+                type: "pointer",
+                variable: variable.value
             }
         }
 
@@ -111,6 +126,11 @@ const evalExpressionTree = (function() {
 
             if (node.type === "null-pointer") {
                 return node
+            } else if (node.type === "pointer") {
+                if (!memory.hasIdentifier(node.variable)) {
+                    throw new Error(`unknown variable ${node.variable}`)
+                }
+                return memory.getTypedPointerTo(node.variable)
             }
 
             assert(node.type === "number")

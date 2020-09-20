@@ -101,9 +101,9 @@ class Memory {
             bytes = this._getIntBytes(typedvalue)
         } else if (typedvalue.type.endsWith("*")) {
             if (typedvalue.value === null) {
-                bytes = ['0'.repeat(8)]
+                bytes = ['0x00']
             } else {
-                throw new Error("not implemented")
+                bytes = [`0x${typedvalue.value.toString(16).padStart(2, "0")}`]
             }
         } else {
             console.error(typedvalue.type)
@@ -222,6 +222,14 @@ class Memory {
         assert(old.type === typedvalue.type)
         this.memory[identifier].typedvalue = typedvalue
         this._updateVisualization(identifier)
+    }
+
+    getTypedPointerTo(identifier) {
+        assert(this.hasIdentifier(identifier))
+        return {
+            type: this.memory[identifier].typedvalue.type + "*",
+            value: this.memory[identifier].position
+        }
     }
 
 }

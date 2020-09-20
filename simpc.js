@@ -41,8 +41,15 @@ const evalSimpC = (function() {
                     c.consume()
                 }
                 c.consume() // consume the '\n'
-            } if (c === "+" || c === "-" || c === '=' || c === "*" || c === "/") {
-                // TODO: support *, /, &, |, &&, ||, ^, etc
+            } if (
+                c === "+" ||
+                c === "-" ||
+                c === '=' ||
+                c === "*" ||
+                c === "/" ||
+                c === "&"
+            ) {
+                // TODO: support |, &&, ||, ^, etc
                 tokens.push({
                     type: 'operator',
                     value: c,
