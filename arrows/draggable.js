@@ -5,12 +5,21 @@ document.addEventListener("DOMContentLoaded", _ => {
     for (let draggable of draggables) {
         draggable.addEventListener("mousedown", e => {
             e.preventDefault()
-            const rect = e.target.getClientRects()[0]
+            const originalRect = e.target.getBoundingClientRect()
+            const mouse = {
+                x: e.clientX - originalRect.x,
+                y: e.clientY - originalRect.y,
+            }
+            e.target.style.left = '0'
+            e.target.style.top = '0'
+            const rect = e.target.getBoundingClientRect()
+            e.target.style.left = (originalRect.x - rect.x) + 'px'
+            e.target.style.top = (originalRect.y - rect.y) + 'px'
             dragging = {
                 element: e.target,
                 origin: {
-                    x: e.clientX - rect.x,
-                    y: e.clientY - rect.y
+                    x: rect.x + mouse.x,
+                    y: rect.y + mouse.y
                 }
             }
             e.target.classList.add('dragged')

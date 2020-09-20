@@ -6,6 +6,19 @@
     <style type="text/css">
         body {
             font-family: "Roboto Mono", monospace;
+            background-color: #ecf0f1;
+        }
+
+        .content {
+            width: 640px;
+            margin: auto;
+            background-color: white;
+            position: relative;
+            height: 480px;
+        }
+
+        h1 {
+            text-align: center;
         }
 
         .box {
@@ -18,7 +31,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            background-color: #ecf0f1;
+            background-color: #bdc3c7;
             user-select: none;
         }
 
@@ -28,7 +41,7 @@
             height: 16px;
             border-radius: 100%;
             background-color: #e74c3c;
-            z-index: 2;
+            z-index: 20;
         }
 
         .box.dragged {
@@ -50,7 +63,13 @@
         }
 
         #a {
-            left: 200px;
+            left: 96px;
+            top: 64px;
+        }
+
+        #b {
+            left: 512px;
+            top: 320px;
             width: 64px;
             height: 64px;
         }
@@ -59,12 +78,15 @@
 </head>
 <body>
 
-    <div class="box draggable" id="a">
-        A
-    </div>
-    <div class="box draggable" id="b">
-        B
-    </div>
+    <h1>Arrow</h1>
+    <section class="content">
+        <div class="box draggable" id="a">
+            A
+        </div>
+        <div class="box draggable" id="b">
+            B
+        </div>
+    </section>
 
     <script src="draggable.js"></script>
     <script src="arrows.js"></script>
