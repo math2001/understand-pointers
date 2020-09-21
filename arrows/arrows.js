@@ -29,11 +29,32 @@ class Arrow {
 
         this.svg = document.createElementNS(XMLNS, "svg")
         this.svg.classList.add('svg-arrow')
-
-        this.path = document.createElementNS(XMLNS, "path")
-        this.svg.appendChild(this.path)
         document.body.appendChild(this.svg)
 
+        this.path = document.createElementNS(XMLNS, "path")
+        this.path.setAttributeNS(null, "stroke-width", 4)
+        this.svg.appendChild(this.path)
+
+        this.svgtip = document.createElementNS(XMLNS, "svg")
+        this.svgtip.setAttributeNS(null, "viewBox", `0 0 1 1`)
+        this.svgtip.setAttributeNS(null, "width", 16)
+        this.svgtip.setAttributeNS(null, "height", 16)
+        this.svgtip.style.transform = 'rotate(45deg)'
+        this.svgtip.style.transformOrigin = '0 0'
+        this.svgtip.classList.add('svg-arrow')
+        document.body.appendChild(this.svgtip)
+
+        this.tip = document.createElementNS(XMLNS, "path")
+        this.tip.setAttributeNS(null, "d", `
+            M 0,0
+            L 1,0
+            M 0,0
+            L 0,1
+        `)
+        // this.tip.setAttributeNS(null, "fill", "green")
+        this.tip.setAttributeNS(null, "stroke", "red")
+        this.tip.setAttributeNS(null, "stroke-width", 0.5)
+        this.svgtip.appendChild(this.tip)
     }
 
     connect(a, b) {
@@ -75,7 +96,7 @@ class Arrow {
         const verticalDistance = Math.abs(pointFrom.y - pointTo.y)
 
         // create a new svg element
-        this.svg.setAttributeNS(null, "viewbox", `0 0 ${horizontalDistance} ${verticalDistance}`)
+        this.svg.setAttributeNS(null, "viewBox", `0 0 ${horizontalDistance} ${verticalDistance}`)
         this.svg.setAttributeNS(null, "width", horizontalDistance)
         this.svg.setAttributeNS(null, "height", verticalDistance)
 
@@ -93,6 +114,28 @@ class Arrow {
         this.path.setAttributeNS(null, "fill", "none")
         this.path.setAttributeNS(null, "stroke", "red")
 
+        // adjustement to leave some empty space
+        const adjustment = {x: 0, y: 0}
+
+        const EMPTY_SPACE = 2
+        // 45deg -> pointing towards the top
+
+        if (pointTo.y === rectb.bottom) {
+            this.svgtip.style.transform = 'rotate(45deg)'
+            adjustment.y += EMPTY_SPACE
+        } else if (pointTo.x === rectb.left) {
+            this.svgtip.style.transform = 'rotate(135deg)'
+            adjustment.x -= EMPTY_SPACE
+        } else if (pointTo.y === rectb.top) {
+            this.svgtip.style.transform = 'rotate(225deg)'
+            adjustment.y -= EMPTY_SPACE
+        } else if (pointTo.x === rectb.right) {
+            adjustment.x += EMPTY_SPACE
+            this.svgtip.style.transform = 'rotate(315deg)'
+        } else {
+            assert(false)
+        }
+
         const svgFrom = {
             x: pointFrom.x - topleft.x,
             y: pointFrom.y - topleft.y
@@ -101,6 +144,7 @@ class Arrow {
             x: pointTo.x - topleft.x,
             y: pointTo.y - topleft.y
         }
+
         if (
             (pointFrom.x === recta.left || pointFrom.x === recta.right) &&
             (pointTo.x === rectb.left || pointTo.x === rectb.right)
@@ -109,7 +153,7 @@ class Arrow {
                 M ${svgFrom.x},${svgFrom.y}
                 l ${Math.trunc((svgTo.x - svgFrom.x) / 2)},0
                 l 0,${(svgTo.y - svgFrom.y)}
-                L ${svgTo.x},${svgTo.y}
+                L ${svgTo.x + adjustment.x * 2},${svgTo.y + adjustment.y * 2}
             `)
         } else if (
             (pointFrom.y === recta.top || pointFrom.y === recta.bottom) &&
@@ -119,24 +163,27 @@ class Arrow {
                 M ${svgFrom.x},${svgFrom.y}
                 l 0,${Math.trunc((svgTo.y - svgFrom.y) / 2)}
                 l ${svgTo.x - svgFrom.x},0
-                L ${svgTo.x},${svgTo.y}
+                L ${svgTo.x + adjustment.x * 2},${svgTo.y + adjustment.y * 2}
             `)
         } else if (pointFrom.y === recta.top || pointFrom.y === recta.bottom) {
             this.path.setAttributeNS(null, "d", `
                 M ${svgFrom.x},${svgFrom.y}
                 l 0,${svgTo.y - svgFrom.y}
-                L ${svgTo.x},${svgTo.y}
+                L ${svgTo.x + adjustment.x * 2},${svgTo.y + adjustment.y * 2}
             `)
         } else if (pointFrom.x === recta.left || pointFrom.x === recta.right) {
             this.path.setAttributeNS(null, "d", `
                 M ${svgFrom.x},${svgFrom.y}
                 l ${svgTo.x - svgFrom.x},0
-                L ${svgTo.x},${svgTo.y}
+                L ${svgTo.x + adjustment.x * 2},${svgTo.y + adjustment.y * 2}
             `)
         } else {
             console.error(pointFrom, pointTo)
             throw new Error("unexpected case")
         }
+
+        this.svgtip.style.left = pointTo.x + adjustment.x + 'px'
+        this.svgtip.style.top = pointTo.y + adjustment.y + 'px'
     }
 
     _getRect(elem) {

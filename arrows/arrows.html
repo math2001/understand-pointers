@@ -42,6 +42,7 @@
             border-radius: 100%;
             background-color: #e74c3c;
             z-index: 20;
+            display: none;
         }
 
         .box.dragged {
@@ -52,13 +53,9 @@
             position: absolute;
             top: 0;
             left: 0;
-            /* make sure the svg is pixel perfect (transform aligns things
-            on the raster grid*/
-            /* not 100% sure if that actually does anything*/
-            transform: translate(0, 0);
+            z-index: 50;
         }
         .svg-arrow path {
-            stroke-width: 4px;
             stroke: #e74c3c;
         }
 
@@ -105,7 +102,6 @@
             })
 
             document.addEventListener('keydown', e => {
-                console.log(a, b)
                 if (arrow !== null)
                     arrow.connect(a, b)
             })
