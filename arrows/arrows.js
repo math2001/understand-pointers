@@ -107,7 +107,7 @@ class Arrow {
         ) {
             this.path.setAttributeNS(null, "d", `
                 M ${svgFrom.x},${svgFrom.y}
-                l ${(svgTo.x - svgFrom.x) / 2},0
+                l ${Math.trunc((svgTo.x - svgFrom.x) / 2)},0
                 l 0,${(svgTo.y - svgFrom.y)}
                 L ${svgTo.x},${svgTo.y}
             `)
@@ -117,7 +117,7 @@ class Arrow {
         ) {
             this.path.setAttributeNS(null, "d", `
                 M ${svgFrom.x},${svgFrom.y}
-                l 0,${(svgTo.y - svgFrom.y) / 2}
+                l 0,${Math.trunc((svgTo.y - svgFrom.y) / 2)}
                 l ${svgTo.x - svgFrom.x},0
                 L ${svgTo.x},${svgTo.y}
             `)
