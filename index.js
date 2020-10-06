@@ -26,13 +26,9 @@ class Memory {
     }
 
     initialize(identifier, type, typedvalue) {
-        if (type.endsWith("*") && typedvalue.type === "null-pointer") {
-            typedvalue.type = type
-        }
-
         if (type !== typedvalue.type) {
             console.error(`type: ${type}, typedvalue:`, typedvalue)
-            throw new Error("mismatching type")
+            throw new Error(`mismatching type: variable is ${type}, expression is ${typedvalue.type} (${typedvalue.value})`)
         }
 
         if (

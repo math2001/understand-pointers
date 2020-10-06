@@ -132,7 +132,7 @@ const evalSimpC = (function() {
         // the kind of lines we can get
         //   int a = 10;
         //   a = a + 20;
-        //   int p = &a;
+        //   int* p = &a;
 
         line = line.trim()
 
@@ -140,6 +140,7 @@ const evalSimpC = (function() {
         if (tokenline.done()) {
             return false;
         }
+
 
         const first = tokenline.consume()
         if (first.type !== 'word') {
@@ -151,9 +152,9 @@ const evalSimpC = (function() {
             // declare new variable
             // int a = 10;
             let type = first.value;
-            if (tokenline.peek().type === 'operator' && tokenline.peek().value === "*") {
+            while (tokenline.peek().type === 'operator' && tokenline.peek().value === "*") {
                 tokenline.consume()
-                type = first.value + '*'
+                type = type + '*'
             }
             noeol(tokenline)
 
@@ -164,6 +165,7 @@ const evalSimpC = (function() {
             }
 
             noeol(tokenline)
+
             const equal = tokenline.consume()
             if (equal.type === 'semicolon') {
                 assert(tokenline.done())
@@ -176,12 +178,17 @@ const evalSimpC = (function() {
                 throw new Error("SyntaxError: expected equal token")
             }
             const typedvalue = evalExpr(tokenline, memory)
+
+            if (typedvalue.type === 'null-pointer' && type.endsWith('*')) {
+                typedvalue.type = type
+            }
+
             memory.initialize(identifier.value, type, typedvalue)
             return true
         }
 
         if (first.type === "word") {
-            noeol(tokenline, "a single isn't a valid statement")
+            noeol(tokenline, "a single word isn't a valid statement")
 
             const equal = tokenline.consume()
             assert(equal.type === "operator")
@@ -192,9 +199,11 @@ const evalSimpC = (function() {
 
             const typedvalue = evalExpr(tokenline, memory)
             const old = memory.getTypedValue(first.value)
-            if (old.type !== typedvalue.type) {
-                throw new Error(`mismatching type: variable is ${old.type}, expression is ${typedvalue.type} (${typedvalue.value})`)
+
+            if (typedvalue.type === 'null-pointer' && old.type.endsWith('*')) {
+                typedvalue.type = old.type
             }
+
             memory.setTypedValue(first.value, typedvalue)
             return true
         }
