@@ -25,17 +25,22 @@ class Memory {
         }
     }
 
+    isvalidtype(type) {
+        let length = type.length;
+        while (type[length - 1] === '*') {
+            length--;
+        }
+        return typesSize[type.slice(0, length)] !== undefined
+    }
+
     initialize(identifier, type, typedvalue) {
         if (type !== typedvalue.type) {
             console.error(`type: ${type}, typedvalue:`, typedvalue)
             throw new Error(`mismatching type: variable is ${type}, expression is ${typedvalue.type} (${typedvalue.value})`)
         }
 
-        if (
-            typesSize[type] === undefined &&
-            !(type.endsWith('*') && typesSize[type.slice(0, -1)] !== undefined)
-        ) {
-            throw new Error(`CompileError: unknown type ${type}`)
+        if (!this.isvalidtype(type)) {
+            throw new Error(`unknown type ${type}`)
         }
 
         if (this.memory[identifier] !== undefined) {
@@ -50,7 +55,7 @@ class Memory {
             position: this.stackpointer
         }
 
-        if (type.endsWith("*") && typesSize[type.slice(0, -1)] !== undefined) {
+        if (type.endsWith("*")) {
             this.stackpointer += POINTER_SIZE
         } else if (typesSize[type] !== undefined) {
             this.stackpointer += typesSize[type]
@@ -180,13 +185,7 @@ class Memory {
     getRepr(typedvalue) {
         assert(typedvalue !== undefined)
         assert(typeof typedvalue.type === "string")
-        assert(
-            typesSize[typedvalue.type] !== undefined ||
-            (
-                typedvalue.type[typedvalue.type.length - 1] === "*" &&
-                typesSize[typedvalue.type.slice(0, -1)] !== undefined
-            )
-        )
+        assert( this.isvalidtype(typedvalue.type))
 
         if (typedvalue.type === "int") {
             return typedvalue.value
@@ -197,7 +196,7 @@ class Memory {
             if (typedvalue.value === null) {
                 return 'NULL'
             }
-            return '0x' + typedvalue.value.toString(16).padStart(4, "0")
+            return '0x' + typedvalue.value.toString(16).padStart(2, "0")
         }
 
         console.error(`type: ${typedvalue.type} value:`, typedvalue.value)
