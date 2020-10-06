@@ -34,10 +34,7 @@ class Memory {
     }
 
     initialize(identifier, type, typedvalue) {
-        if (type !== typedvalue.type) {
-            console.error(`type: ${type}, typedvalue:`, typedvalue)
-            throw new Error(`mismatching type: variable is ${type}, expression is ${typedvalue.type} (${typedvalue.value})`)
-        }
+        this.assertMatchingType(type, typedvalue)
 
         if (!this.isvalidtype(type)) {
             throw new Error(`unknown type ${type}`)
@@ -214,7 +211,7 @@ class Memory {
 
     setTypedValue(identifier, typedvalue) {
         const old = this.getTypedValue(identifier)
-        assert(old.type === typedvalue.type)
+        this.assertMatchingType(old.type, typedvalue)
         this.memory[identifier].typedvalue = typedvalue
         this._updateVisualization(identifier)
     }
@@ -225,6 +222,14 @@ class Memory {
             type: this.memory[identifier].typedvalue.type + "*",
             value: this.memory[identifier].position
         }
+    }
+
+    assertMatchingType(oldtype, newtypedvalue) {
+        if (oldtype === newtypedvalue.type)
+            return
+
+        console.error(`type: ${oldtype}, typedvalue:`, newtypedvalue)
+        throw new Error(`mismatching type: variable is ${oldtype}, expression is ${newtypedvalue.type} (value: ${newtypedvalue.value})`)
     }
 
 }
