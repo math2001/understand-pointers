@@ -107,11 +107,7 @@ class Memory {
         if (typedvalue.type === "int") {
             bytes = this._getIntBytes(typedvalue)
         } else if (typedvalue.type.endsWith("*")) {
-            if (typedvalue.value === null) {
-                bytes = ['0x00']
-            } else {
-                bytes = [`0x${typedvalue.value.toString(16).padStart(2, "0")}`]
-            }
+            bytes = this._getPointerBytes(typedvalue.value)
         } else {
             console.error(typedvalue.type)
             assert(false)
@@ -219,6 +215,15 @@ class Memory {
             bytes.push(bits.slice(i * 8, (i + 1) * 8))
         }
         return bytes
+    }
+
+    _getPointerBytes(address) {
+        if (address === null) {
+            address = 0
+        } else {
+            assert(address > 0)
+        }
+        return [address.toString(2).padStart(8, '0')]
     }
 
     getRepr(typedvalue) {
