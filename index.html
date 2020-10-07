@@ -26,7 +26,6 @@
                 Generating memory table...
             </article>
         </section>
-        <button id="a">Connect</button>
     </main>
 
     <script src="common.js"></script>
@@ -34,14 +33,5 @@
     <script src="expression-tree.js"></script>
     <script src="simpc.js"></script>
     <script src="index.js"></script>
-
-    <script>
-        let arr = new Arrow()
-        a.addEventListener('click', e => {
-            e.preventDefault()
-            const desc = document.querySelectorAll('.memory-description')
-            arr.connect(desc[0], desc[1])
-        })
-    </script>
 </body>
 </html>

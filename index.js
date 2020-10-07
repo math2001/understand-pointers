@@ -48,12 +48,14 @@ class Memory {
         }
 
         this.memory[identifier] = {
-            typedvalue:  typedvalue,
-            position: this.stackpointer
+            typedvalue: typedvalue,
+            position: this.stackpointer,
+            pointerArrow: undefined,
         }
 
         if (type.endsWith("*")) {
             this.stackpointer += POINTER_SIZE
+            this.memory[identifier].pointerArrow = null
         } else if (typesSize[type] !== undefined) {
             this.stackpointer += typesSize[type]
         } else {
@@ -64,11 +66,9 @@ class Memory {
         this._updateVisualization(identifier)
     }
 
-    _updateVisualization(identifier) {
-        assert(!isNaN(this.memory[identifier].position))
-
-        const x = this.memory[identifier].position % BYTES_PER_ROW
-        const y = (this.memory[identifier].position - x) / BYTES_PER_ROW
+    _getCellElement(position) {
+        const x = position % BYTES_PER_ROW
+        const y = (position - x) / BYTES_PER_ROW
 
         let row = this.table.firstElementChild
         for (let i = 0; i < y; i++) {
@@ -82,6 +82,15 @@ class Memory {
             cell = cell.nextElementSibling
         }
         assert(cell !== null)
+
+        return cell
+    }
+
+    _updateVisualization(identifier) {
+        const position = this.memory[identifier].position
+        assert(!isNaN(position))
+
+        let cell = this._getCellElement(position)
 
         let description = cell.querySelector(".memory-description")
         if (description === null) {
@@ -108,8 +117,9 @@ class Memory {
             assert(false)
         }
 
+        let row = cell.parentElement
         for (let i = 0; i < bytes.length; i++) {
-            if (x + i === BYTES_PER_ROW) {
+            if (cell === null) {
                 row = row.nextElementSibling
                 assert(row !== null)
                 cell = row.firstElementChild.nextElementSibling
@@ -126,7 +136,35 @@ class Memory {
 
             cell = cell.nextElementSibling
         }
+
+        if (typedvalue.type.endsWith("*")) {
+            this._connectPointerArrow(identifier)
+        }
     }
+
+    _connectPointerArrow(identifier) {
+        assert(this.memory[identifier] !== undefined)
+        assert(this.memory[identifier].pointerArrow !== undefined)
+
+        if (this.memory[identifier].typedvalue.value === null) {
+            // null pointer
+            return
+        }
+
+        if (this.memory[identifier].pointerArrow === null) {
+            this.memory[identifier].pointerArrow = new Arrow()
+        }
+        const pointerCell = this._getCellElement(this.memory[identifier].position)
+        const pointerDescription = pointerCell.querySelector('.memory-description')
+        assert(pointerDescription !== null)
+
+        const targetCell = this._getCellElement(this.memory[identifier].typedvalue.value)
+        const targetDescription = targetCell.querySelector('.memory-description')
+        assert(targetDescription !== null)
+
+        this.memory[identifier].pointerArrow.connect(pointerDescription, targetDescription)
+    }
+
 
     clear() {
         let row = this.table.firstElementChild
@@ -140,6 +178,10 @@ class Memory {
             row = row.nextElementSibling
         }
         for (let name in this.memory) {
+            if (this.memory[name].pointerArrow) {
+                this.memory[name].pointerArrow.destroy()
+                delete this.memory[name].pointerArrow
+            }
             delete this.memory[name]
         }
         this.stackpointer = 1

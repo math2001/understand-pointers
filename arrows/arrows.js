@@ -58,6 +58,9 @@ class Arrow {
     }
 
     connect(a, b) {
+        assert(a !== null)
+        assert(b !== null)
+        
         const recta = this._getRect(a)
         const rectb = this._getRect(b)
 
