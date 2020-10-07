@@ -92,8 +92,9 @@ class Arrow {
         this.to.style.left = pointTo.x - (POINT_SIZE / 2) + 'px'
         this.to.style.top = pointTo.y - (POINT_SIZE / 2) + 'px'
 
-        const horizontalDistance = Math.abs(pointFrom.x - pointTo.x)
-        const verticalDistance = Math.abs(pointFrom.y - pointTo.y)
+        // if we have distance = 0, then we use 1
+        const horizontalDistance = Math.abs(pointFrom.x - pointTo.x) || 1;
+        const verticalDistance = Math.abs(pointFrom.y - pointTo.y) || 1;
 
         // create a new svg element
         this.svg.setAttributeNS(null, "viewBox", `0 0 ${horizontalDistance} ${verticalDistance}`)
