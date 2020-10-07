@@ -335,6 +335,7 @@ const resetExecution = () => {
     sourcecode = editorTextarea.value
     activeLineIndex = -1
     memory.clear()
+    updateEditor()
 }
 
 const runSimpC = (line, memory) => {
@@ -368,12 +369,12 @@ runlineButton.addEventListener("click", e => {
 
 editorTextarea.addEventListener("input", e => {
     resetExecution()
-    updateEditor()
 })
 
 editorTextarea.addEventListener("select", e => {
     updateEditor()
 })
+
 editorTextarea.addEventListener("keydown", e => {
     // motherfucking horrible. But there is no other option
     setTimeout(updateEditor, 50)
@@ -387,6 +388,11 @@ editorTextarea.addEventListener('scroll', e => {
     editorView.scrollTop = editorTextarea.scrollTop
 })
 
+document.querySelector('#reset-exec').addEventListener('click', e => {
+    e.preventDefault()
+    resetExecution()
+})
+
 updateEditor()
 
 editor.focus()
@@ -396,11 +402,5 @@ const memory = new Memory(memoryTable)
 memoryView.innerHTML = ''
 memoryView.appendChild(memoryTable)
 
-// memory.initialize('var1', 'char', 'a')
-// memory.initialize('var2', 'char', 'b')
-// memory.initialize('var3', 'char', 'c')
-// memory.initialize('var4', 'char', 'd')
-// memory.initialize('var5', 'char', 'e')
-// memory.initialize('var6', 'char', 'f')
-// memory.initialize('var7', 'char', 'g')
+
 })
