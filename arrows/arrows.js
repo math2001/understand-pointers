@@ -181,6 +181,13 @@ class Arrow {
         this.svgtip.style.top = pointTo.y + adjustment.y + 'px'
     }
 
+    destroy() {
+        this.to.parentElement.removeChild(this.to)
+        this.from.parentElement.removeChild(this.from)
+        this.svg.parentElement.removeChild(this.svg)
+        this.svgtip.parentElement.removeChild(this.svgtip)
+    }
+
     _getRect(elem) {
         return elem.getBoundingClientRect()
         // const rects = elem.getClientRects()
