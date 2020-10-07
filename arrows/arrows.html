@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <title>Arrows</title>
+    <link rel="stylesheet" type="text/css" href="arrows.css">
     <style type="text/css">
         body {
             font-family: "Roboto Mono", monospace;
@@ -35,28 +36,8 @@
             user-select: none;
         }
 
-        .point {
-            position: absolute;
-            width: 16px;
-            height: 16px;
-            border-radius: 100%;
-            background-color: #e74c3c;
-            z-index: 20;
-            display: none;
-        }
-
         .box.dragged {
             background-color: #95a5a6;
-        }
-
-        .svg-arrow {
-            position: absolute;
-            top: 0;
-            left: 0;
-            z-index: 50;
-        }
-        .svg-arrow path {
-            stroke: #e74c3c;
         }
 
         #a {

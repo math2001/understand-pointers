@@ -81,11 +81,6 @@ class Arrow {
         const pointFrom = mindistancepoints[0]
         const pointTo = mindistancepoints[1]
 
-        // const from = document.createElement('div')
-        // const to = document.createElement('div')
-        // from.classList.add('point', 'from')
-        // to.classList.add('point', 'to')
-
         this.from.style.left = pointFrom.x - (POINT_SIZE / 2) + 'px'
         this.from.style.top = pointFrom.y - (POINT_SIZE / 2) + 'px'
 
@@ -96,7 +91,6 @@ class Arrow {
         const horizontalDistance = Math.abs(pointFrom.x - pointTo.x) || 1;
         const verticalDistance = Math.abs(pointFrom.y - pointTo.y) || 1;
 
-        // create a new svg element
         this.svg.setAttributeNS(null, "viewBox", `0 0 ${horizontalDistance} ${verticalDistance}`)
         this.svg.setAttributeNS(null, "width", horizontalDistance)
         this.svg.setAttributeNS(null, "height", verticalDistance)
@@ -188,9 +182,10 @@ class Arrow {
     }
 
     _getRect(elem) {
-        const rects = elem.getClientRects()
-        assert(rects.length === 1)
-        return rects[0]
+        return elem.getBoundingClientRect()
+        // const rects = elem.getClientRects()
+        // assert(rects.length === 1)
+        // return rects[0]
     }
 
     _getConnectPoints(rect) {
