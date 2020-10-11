@@ -26,7 +26,8 @@ h1 {
   padding: 12px;
 }
 
-.code-view, .memory-view {
+.code-view,
+.memory-view {
   width: 50%;
   display: inline-block;
   padding: 16px;
@@ -49,7 +50,7 @@ h1 {
   resize: none;
   font-family: var(--monospace);
   font-size: 16px;
-  opacity: .1;
+  opacity: 0.1;
   z-index: 10;
 }
 
@@ -66,7 +67,6 @@ h1 {
   margin: 0;
   white-space: pre-wrap;
 }
-
 
 .editor-view .line {
   display: inline-block;
@@ -126,4 +126,12 @@ h1 {
   padding-right: 4px;
   text-align: right;
   width: 54px;
+}
+
+footer {
+  text-align: center;
+}
+
+footer a {
+  color: #34495e;
 }

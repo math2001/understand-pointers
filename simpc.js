@@ -1,4 +1,4 @@
-const evalSimpC = (function() {
+const evalSimpC = (function () {
 
     class TokenStream {
         constructor(tokens) {

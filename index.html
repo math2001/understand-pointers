@@ -1,36 +1,44 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset="utf-8">
+  <head>
+    <meta charset="utf-8" />
     <title>Understanding pointers</title>
-    <link rel="stylesheet" type="text/css" href="arrows/arrows.css">
-    <link rel="stylesheet" type="text/css" href="index.css">
-</head>
-<body>
+    <link rel="stylesheet" type="text/css" href="arrows/arrows.css" />
+    <link rel="stylesheet" type="text/css" href="index.css" />
+  </head>
+  <body>
     <h1>Understanding pointers</h1>
     <main class="main">
-        <section class="toolbar">
-            <button id="run-line">Run line</button>
-            <button id="reset-exec">Reset</button>
-            <button id="run-all" onclick="alert('todo')">Run all</button>
-        </section>
-        <section class="split">
-            <article class="code-view" id="code-view">
-                <div class="editor" id="editor">
-                    <textarea id="editor-textarea" class="editor-textarea"></textarea>
-                    <pre id="editor-view" class="editor-view"></pre>
-                </div>
-            </article><!-- this comment is important
-             --><article class="memory-view" id="memory-view">
-                Generating memory table...
-            </article>
-        </section>
+      <section class="toolbar">
+        <button id="run-line">Run line</button>
+        <button id="reset-exec">Reset</button>
+        <button id="run-all" onclick="alert('todo')">Run all</button>
+      </section>
+      <section class="split">
+        <article class="code-view" id="code-view">
+          <div class="editor" id="editor">
+            <textarea id="editor-textarea" class="editor-textarea"></textarea>
+            <pre id="editor-view" class="editor-view"></pre>
+          </div>
+        </article>
+        <!-- this comment is important
+             -->
+        <article class="memory-view" id="memory-view">
+          Generating memory table...
+        </article>
+      </section>
     </main>
+
+    <footer>
+      <p>
+        <a href="arrows/arrows.html"><code>arrows.html</code></a>
+      </p>
+    </footer>
 
     <script src="common.js"></script>
     <script src="arrows/arrows.js"></script>
     <script src="expression-tree.js"></script>
     <script src="simpc.js"></script>
     <script src="index.js"></script>
-</body>
+  </body>
 </html>

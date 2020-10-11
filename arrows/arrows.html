@@ -6,12 +6,13 @@
     <link rel="stylesheet" type="text/css" href="arrows.css">
     <style type="text/css">
         body {
-            font-family: "Roboto Mono", monospace;
             background-color: #ecf0f1;
+            font-family: 'Ubuntu';
         }
 
         .content {
             width: 640px;
+            font-family: "Roboto Mono", monospace;
             margin: auto;
             background-color: white;
             position: relative;
@@ -56,6 +57,10 @@
             text-align: center;
         }
 
+        input[type="checkbox"] {
+            vertical-align: middle;
+        }
+
     </style>
 </head>
 <body>
@@ -64,6 +69,7 @@
     <p class="buttons">
         <button id="connect">Connect</button>
         <button id="destroy">Destroy arrow</button>
+        <input type="checkbox" id="only-show-on-hover"> <label for="only-show-on-hover">Only show on hover</label>
     </p>
 
     <section class="content">
@@ -80,6 +86,7 @@
     <script>
         let arrow = null;
         document.addEventListener("DOMContentLoaded", _ => {
+            const onlyShowOnHover = document.querySelector("#only-show-on-hover")
             const a = document.querySelector("#a")
             const b = document.querySelector("#b")
 
@@ -109,6 +116,19 @@
                 }
                 arrow = new Arrow()
                 arrow.connect(a, b)
+
+                if (onlyShowOnHover.checked === true) {
+                    arrow.hide()
+                }
+            })
+
+            onlyShowOnHover.addEventListener('change', e => {
+                if (arrow === null) return
+                if (onlyShowOnHover.checked === true) {
+                    arrow.hide()
+                } else {
+                    arrow.show()
+                }
             })
         })
 

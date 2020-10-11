@@ -117,7 +117,7 @@ const buildExpressionTree = (function () {
     return tokenline => parseExpr(tokenline, 0)
 })()
 
-const evalExpressionTree = (function() {
+const evalExpressionTree = (function () {
     const requireMatchingType = (left, right) => {
         assert(typeof left.type === "string")
         assert(typeof right.type === "string")
