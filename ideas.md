@@ -1,0 +1,2 @@
+- keep track of the state of the application in the url
+- go backwards? V hard

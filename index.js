@@ -25,6 +25,15 @@ document.addEventListener("DOMContentLoaded", _ => {
                 const row = getMemoryTableRow(i, BYTES_PER_ROW)
                 memoryTable.appendChild(row)
             }
+
+            this.showRawBits = document.querySelector("#show-raw-bits")
+            assert(this.showRawBits !== null)
+
+            this.showRawBits.addEventListener('change', () => {
+                for (let name in this.memory) {
+                    this._updateVisualization(name)
+                }
+            })
         }
 
         isvalidtype(type) {
@@ -102,26 +111,27 @@ document.addEventListener("DOMContentLoaded", _ => {
                 description.classList.add("memory-description")
                 cell.appendChild(description)
 
-                description.addEventListener('mouseenter', () => {
-                    this.memory[identifier].pointerArrow.show()
-                })
-                description.addEventListener('mouseleave', () => {
-                    this.memory[identifier].pointerArrow.hide()
-                })
+                if (this.memory[identifier].pointerArrow !== undefined) {
+                    description.addEventListener('mouseenter', () => {
+                        this.memory[identifier].pointerArrow.show()
+                    })
+                    description.addEventListener('mouseleave', () => {
+                        this.memory[identifier].pointerArrow.hide()
+                    })
+                }
             }
 
             const typedvalue = this.memory[identifier].typedvalue
             const repr = this.getRepr(typedvalue)
-            description.textContent = `${typedvalue.type} ${identifier} = ${repr}`
-
-            let bytes
-            if (typedvalue.type === "int") {
-                bytes = this._getIntBytes(typedvalue)
-            } else if (typedvalue.type.endsWith("*")) {
-                bytes = this._getPointerBytes(typedvalue.value)
+            let bytes = this._getBytes(typedvalue)
+            if (this.showRawBits.checked) {
+                description.textContent = `${typedvalue.type} ${identifier} = ${repr}`
             } else {
-                console.error(typedvalue.type)
-                assert(false)
+                description.textContent = `${typedvalue.type} ${identifier}`
+                bytes[0] = repr
+                for (let i = 1; i < bytes.length; i++) {
+                    bytes[i] = "..."
+                }
             }
 
             let row = cell.parentElement
@@ -147,6 +157,17 @@ document.addEventListener("DOMContentLoaded", _ => {
             if (typedvalue.type.endsWith("*")) {
                 this._connectPointerArrow(identifier)
             }
+        }
+
+        _getBytes(typedvalue) {
+            if (typedvalue.type === "int") {
+                return this._getIntBytes(typedvalue)
+            } else if (typedvalue.type.endsWith("*")) {
+                return this._getPointerBytes(typedvalue.value)
+            }
+
+            console.error(typedvalue.type)
+            assert(false)
         }
 
         _connectPointerArrow(identifier) {
