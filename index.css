@@ -21,6 +21,14 @@ h1 {
   margin: auto;
 }
 
+.split {
+  display: flex;
+}
+
+.split > article {
+  flex: 1 1 0;
+}
+
 .toolbar {
   text-align: center;
   padding: 12px;

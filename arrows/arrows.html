@@ -98,11 +98,6 @@
                     arrow.connect(a, b)
             })
 
-            document.addEventListener('keydown', e => {
-                if (arrow !== null)
-                    arrow.connect(a, b)
-            })
-
             document.querySelector('#destroy').addEventListener('click', e => {
                 e.preventDefault()
                 arrow.destroy()
