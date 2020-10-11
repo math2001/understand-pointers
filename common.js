@@ -67,4 +67,9 @@ function getTextNodeAtPosition(root, index) {
 }
 
 class SimpCError extends Error {
+    constructor(message) {
+        super(message)
+
+        this.name = "SimpCError"
+    }
 }

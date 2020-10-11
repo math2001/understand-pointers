@@ -7,13 +7,13 @@ const evalSimpC = (function () {
         }
         consume() {
             if (this.done()) {
-                throw new SimpCError("no more tokens")
+                throw new Error("no more tokens")
             }
             return this.tokens[this.i++]
         }
         peek() {
             if (this.done()) {
-                throw new SimpCError("no more tokens")
+                throw new Error("no more tokens")
             }
             return this.tokens[this.i]
         }
@@ -21,6 +21,10 @@ const evalSimpC = (function () {
             assert(this.i >= 0)
             assert(this.i <= this.tokens.length)
             return this.i === this.tokens.length
+        }
+
+        view() {
+            return this.tokens.slice(this.i)
         }
     }
 
@@ -36,12 +40,11 @@ const evalSimpC = (function () {
             assert(c.length === 1)
 
             if (c === '/' && chars.peek() === '/') {
-                while (!c.done() && c.peek() !== '\n') {
-                    // consume the rest of the line
-                    c.consume()
+                while (!chars.done()) {
+                    // consume the comment
+                    chars.consume()
                 }
-                c.consume() // consume the '\n'
-            } if (
+            } else if (
                 c === "+" ||
                 c === "-" ||
                 c === '=' ||
@@ -87,12 +90,7 @@ const evalSimpC = (function () {
                     type: 'semicolon',
                     value: ';'
                 })
-                if (!chars.done()) {
-                    console.error(`line: '${line}'`)
-                    throw new SimpCError(`nothing should come after ;`)
-                }
             } else {
-                console.error(`line: '${line}'`)
                 throw new SimpCError(`unknown char '${c}'`)
             }
         }
