@@ -285,6 +285,19 @@ class Memory {
         this._updateVisualization(head)
     }
 
+    getDereferencedTypedValue(identifier, dereferenceCount) {
+        let head = identifier
+        while (dereferenceCount > 0) {
+            assert(this.memory[head] !== undefined)
+            assert(this.memory[head].typedvalue.type.endsWith('*'))
+            head = this.symbols[this.memory[head].typedvalue.value]
+            assert(head !== undefined)
+            dereferenceCount--
+        }
+        assert(this.memory[head] !== undefined)
+        return this.memory[head].typedvalue
+    }
+
     getTypedPointerTo(identifier) {
         assert(this.hasIdentifier(identifier))
         return {

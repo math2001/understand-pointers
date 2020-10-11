@@ -44,12 +44,34 @@ const buildExpressionTree = (function () {
 
             const variable = tokenline.consume()
             if (variable.type !== "word") {
-                throw new Error("expected variable name after &")
+                throw new Error("expected identifier after &")
             }
 
             return {
                 type: "pointer",
                 variable: variable.value
+            }
+        } else if (token.type === "operator" && token.value === "*") {
+            let dereferenceCount = 1
+            while (tokenline.peek().type === "operator" && tokenline.peek().value === '*') {
+                tokenline.consume()
+
+                if (reachedEnd(tokenline)) {
+                    throw new Error("unexpected end of expression after * (dereferencing pointer)")
+                }
+
+                dereferenceCount++;
+            }
+
+            const identifier = tokenline.consume()
+            if (identifier.type !== "word") {
+                throw new Error("expected identifier after * (dereferencing pointer)")
+            }
+
+            return {
+                type: 'dereference',
+                identifier: identifier.value,
+                dereferenceCount: dereferenceCount
             }
         }
 
@@ -131,6 +153,8 @@ const evalExpressionTree = (function() {
                     throw new Error(`unknown variable ${node.variable}`)
                 }
                 return memory.getTypedPointerTo(node.variable)
+            } else if (node.type === "dereference") {
+                return memory.getDereferencedTypedValue(node.identifier, node.dereferenceCount)
             }
 
             assert(node.type === "number")
