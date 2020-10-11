@@ -141,10 +141,36 @@ const evalSimpC = (function() {
             return false;
         }
 
-
         const first = tokenline.consume()
+
+        // **p = &a;
+        if (first.type === "operator" && first.value === "*") {
+            // dereferencing a pointer
+            let dereferenceCount = 1;
+            while (tokenline.peek().type === "operator" && tokenline.peek().value === "*") {
+                tokenline.consume()
+                dereferenceCount++
+            }
+
+            const identifier = tokenline.consume()
+            if (identifier.type !== "word") {
+                throw new Error("SyntaxError: expected word")
+            }
+
+            const equal = tokenline.consume()
+            if (equal.type !== "operator" || equal.value !== "=") {
+                throw new Error("SyntaxError: expected equal")
+            }
+
+            const typedvalue = evalExpr(tokenline, memory)
+
+            memory.setTypedValueDereference(identifier.value, dereferenceCount, typedvalue)
+
+            return true;
+        }
+
         if (first.type !== 'word') {
-            console.error(token)
+            console.error(first)
             throw new Error("SyntaxError: invalid first token")
         }
 
@@ -161,7 +187,7 @@ const evalSimpC = (function() {
             const identifier = tokenline.consume()
             if (identifier.type !== "word") {
                 console.error(identifier)
-                throw new Error("SyntaxError: expected identifer (type word)")
+                throw new Error("SyntaxError: expected identifier (type word)")
             }
 
             noeol(tokenline)

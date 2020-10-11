@@ -15,8 +15,10 @@ class Memory {
         assert(tableElement instanceof HTMLElement)
 
         this.table = tableElement
-        // variable: memory object
+        // identifier: memory object
         this.memory = {}
+        // position: identifier
+        this.symbols = {}
         this.stackpointer = 1
 
         for (let i = 0; i < NUM_ROWS; i++) {
@@ -52,6 +54,8 @@ class Memory {
             position: this.stackpointer,
             pointerArrow: undefined,
         }
+
+        this.symbols[this.stackpointer] = identifier
 
         if (type.endsWith("*")) {
             this.stackpointer += POINTER_SIZE
@@ -181,6 +185,7 @@ class Memory {
             delete this.memory[name]
         }
         this.stackpointer = 1
+        this.symbols = {}
     }
 
     _getPointerBytes(value) {
@@ -261,6 +266,23 @@ class Memory {
         this.assertMatchingType(old.type, typedvalue)
         this.memory[identifier].typedvalue = typedvalue
         this._updateVisualization(identifier)
+    }
+
+    setTypedValueDereference(identifier, dereferenceCount, typedvalue) {
+        // sneaky but works
+        assert(typedvalue.type + '*'.repeat(dereferenceCount) === this.memory[identifier].typedvalue.type)
+
+        let head = identifier
+        while (dereferenceCount > 0) {
+            assert(this.memory[head] !== undefined)
+            assert(this.memory[head].typedvalue.type.endsWith('*'))
+            head = this.symbols[this.memory[head].typedvalue.value]
+            assert(head !== undefined)
+            dereferenceCount--
+        }
+        this.assertMatchingType(this.memory[head].typedvalue.type, typedvalue)
+        this.memory[head].typedvalue.value = typedvalue.value
+        this._updateVisualization(head)
     }
 
     getTypedPointerTo(identifier) {
