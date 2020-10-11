@@ -101,6 +101,13 @@ document.addEventListener("DOMContentLoaded", _ => {
                 description = document.createElement('span')
                 description.classList.add("memory-description")
                 cell.appendChild(description)
+
+                description.addEventListener('mouseenter', () => {
+                    this.memory[identifier].pointerArrow.show()
+                })
+                description.addEventListener('mouseleave', () => {
+                    this.memory[identifier].pointerArrow.hide()
+                })
             }
 
             const typedvalue = this.memory[identifier].typedvalue
@@ -163,6 +170,8 @@ document.addEventListener("DOMContentLoaded", _ => {
             assert(targetDescription !== null)
 
             this.memory[identifier].pointerArrow.connect(pointerDescription, targetDescription)
+            this.memory[identifier].pointerArrow.show()
+            setTimeout(() => this.memory[identifier].pointerArrow.hide(), 500)
         }
 
 
