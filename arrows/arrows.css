@@ -1,20 +1,16 @@
-.point {
-  position: absolute;
-  width: 16px;
-  height: 16px;
-  border-radius: 100%;
-  background-color: #e74c3c;
-  z-index: 20;
-  display: none;
-}
-
 .svg-arrow {
   position: absolute;
   top: 0;
   left: 0;
   z-index: 50;
+  transition-property: opacity;
+  transition-duration: 0.05s;
 }
 
 .svg-arrow path {
   stroke: #e74c3c;
+}
+
+.svg-arrow.hidden {
+  opacity: 0;
 }

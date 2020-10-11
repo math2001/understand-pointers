@@ -130,6 +130,21 @@
                     arrow.show()
                 }
             })
+
+            if (onlyShowOnHover.checked === true) {
+                arrow.hide()
+            } else {
+                arrow.show()
+            }
+
+            a.addEventListener('mouseenter', e => {
+                arrow.show()
+            })
+            a.addEventListener('mouseleave', e => {
+                if (onlyShowOnHover.checked)
+                    arrow.hide()
+            })
+
         })
 
 

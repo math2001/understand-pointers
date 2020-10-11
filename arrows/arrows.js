@@ -27,22 +27,22 @@ const Arrow = (function () {
             this.to.classList.add('point', 'to')
             document.body.appendChild(this.to)
 
-            this.svg = document.createElementNS(XMLNS, "svg")
-            this.svg.classList.add('svg-arrow')
-            document.body.appendChild(this.svg)
+            this.svgTail = document.createElementNS(XMLNS, "svg")
+            this.svgTail.classList.add('svg-arrow')
+            document.body.appendChild(this.svgTail)
 
             this.path = document.createElementNS(XMLNS, "path")
             this.path.setAttributeNS(null, "stroke-width", 4)
-            this.svg.appendChild(this.path)
+            this.svgTail.appendChild(this.path)
 
-            this.svgtip = document.createElementNS(XMLNS, "svg")
-            this.svgtip.setAttributeNS(null, "viewBox", `0 0 1 1`)
-            this.svgtip.setAttributeNS(null, "width", 16)
-            this.svgtip.setAttributeNS(null, "height", 16)
-            this.svgtip.style.transform = 'rotate(45deg)'
-            this.svgtip.style.transformOrigin = '0 0'
-            this.svgtip.classList.add('svg-arrow')
-            document.body.appendChild(this.svgtip)
+            this.svgTip = document.createElementNS(XMLNS, "svg")
+            this.svgTip.setAttributeNS(null, "viewBox", `0 0 1 1`)
+            this.svgTip.setAttributeNS(null, "width", 16)
+            this.svgTip.setAttributeNS(null, "height", 16)
+            this.svgTip.style.transform = 'rotate(45deg)'
+            this.svgTip.style.transformOrigin = '0 0'
+            this.svgTip.classList.add('svg-arrow')
+            document.body.appendChild(this.svgTip)
 
             this.tip = document.createElementNS(XMLNS, "path")
             this.tip.setAttributeNS(null, "d", `
@@ -54,7 +54,17 @@ const Arrow = (function () {
             // this.tip.setAttributeNS(null, "fill", "green")
             this.tip.setAttributeNS(null, "stroke", "red")
             this.tip.setAttributeNS(null, "stroke-width", 0.5)
-            this.svgtip.appendChild(this.tip)
+            this.svgTip.appendChild(this.tip)
+        }
+
+        hide() {
+            this.svgTail.classList.add('hidden')
+            this.svgTip.classList.add('hidden')
+        }
+
+        show() {
+            this.svgTail.classList.remove('hidden')
+            this.svgTip.classList.remove('hidden')
         }
 
         connect(a, b) {
@@ -94,20 +104,20 @@ const Arrow = (function () {
             const horizontalDistance = Math.abs(pointFrom.x - pointTo.x) || 1;
             const verticalDistance = Math.abs(pointFrom.y - pointTo.y) || 1;
 
-            this.svg.setAttributeNS(null, "viewBox", `0 0 ${horizontalDistance} ${verticalDistance}`)
-            this.svg.setAttributeNS(null, "width", horizontalDistance)
-            this.svg.setAttributeNS(null, "height", verticalDistance)
+            this.svgTail.setAttributeNS(null, "viewBox", `0 0 ${horizontalDistance} ${verticalDistance}`)
+            this.svgTail.setAttributeNS(null, "width", horizontalDistance)
+            this.svgTail.setAttributeNS(null, "height", verticalDistance)
 
             const topleft = {
                 x: Math.min(pointFrom.x, pointTo.x),
                 y: Math.min(pointFrom.y, pointTo.y)
             }
 
-            this.svg.style.left = topleft.x + 'px'
-            this.svg.style.top = topleft.y + 'px'
+            this.svgTail.style.left = topleft.x + 'px'
+            this.svgTail.style.top = topleft.y + 'px'
 
             // for some reason, this prevents the svg from being blurry
-            this.svg.style.overflow = "visible"
+            this.svgTail.style.overflow = "visible"
 
             this.path.setAttributeNS(null, "fill", "none")
             this.path.setAttributeNS(null, "stroke", "red")
@@ -119,17 +129,17 @@ const Arrow = (function () {
             // 45deg -> pointing towards the top
 
             if (pointTo.y === rectb.bottom) {
-                this.svgtip.style.transform = 'rotate(45deg)'
+                this.svgTip.style.transform = 'rotate(45deg)'
                 adjustment.y += EMPTY_SPACE
             } else if (pointTo.x === rectb.left) {
-                this.svgtip.style.transform = 'rotate(135deg)'
+                this.svgTip.style.transform = 'rotate(135deg)'
                 adjustment.x -= EMPTY_SPACE
             } else if (pointTo.y === rectb.top) {
-                this.svgtip.style.transform = 'rotate(225deg)'
+                this.svgTip.style.transform = 'rotate(225deg)'
                 adjustment.y -= EMPTY_SPACE
             } else if (pointTo.x === rectb.right) {
                 adjustment.x += EMPTY_SPACE
-                this.svgtip.style.transform = 'rotate(315deg)'
+                this.svgTip.style.transform = 'rotate(315deg)'
             } else {
                 assert(false)
             }
@@ -180,15 +190,15 @@ const Arrow = (function () {
                 throw new Error("unexpected case")
             }
 
-            this.svgtip.style.left = pointTo.x + adjustment.x + 'px'
-            this.svgtip.style.top = pointTo.y + adjustment.y + 'px'
+            this.svgTip.style.left = pointTo.x + adjustment.x + 'px'
+            this.svgTip.style.top = pointTo.y + adjustment.y + 'px'
         }
 
         destroy() {
             this.to.parentElement.removeChild(this.to)
             this.from.parentElement.removeChild(this.from)
-            this.svg.parentElement.removeChild(this.svg)
-            this.svgtip.parentElement.removeChild(this.svgtip)
+            this.svgTail.parentElement.removeChild(this.svgTail)
+            this.svgTip.parentElement.removeChild(this.svgTip)
         }
 
         _getRect(elem) {
