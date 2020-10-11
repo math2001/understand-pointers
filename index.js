@@ -364,6 +364,7 @@ document.addEventListener("DOMContentLoaded", _ => {
     const editor = select("#editor")
     const editorTextarea = select("#editor-textarea")
     const editorView = select("#editor-view")
+    const output = select("#output")
 
     const memoryTable = document.createElement('table')
     memoryTable.classList.add('memory-table')
@@ -401,12 +402,23 @@ document.addEventListener("DOMContentLoaded", _ => {
         activeLineIndex = -1
         memory.clear()
         updateEditor()
+        output.innerHTML = ''
+    }
+
+    const addNewError = (line, error) => {
+        let message = "Internal error, see console for more details"
+        if (error instanceof SimpCError) {
+            message = error.message
+        }
+        const html = `<article class="error"><pre><code>Line:  ${line}\nError: ${message}<pre><code></article>`
+        output.innerHTML += html
     }
 
     const runSimpC = (line, memory) => {
         try {
             return evalSimpC(line, memory)
         } catch (e) {
+            addNewError(line, e)
             console.error(`line: '${line}'`)
             console.error(e)
             return true // just ran a meaningful line (stop execution)

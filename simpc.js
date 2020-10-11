@@ -7,13 +7,13 @@ const evalSimpC = (function () {
         }
         consume() {
             if (this.done()) {
-                throw new Error("no more tokens")
+                throw new SimpCError("no more tokens")
             }
             return this.tokens[this.i++]
         }
         peek() {
             if (this.done()) {
-                throw new Error("no more tokens")
+                throw new SimpCError("no more tokens")
             }
             return this.tokens[this.i]
         }
@@ -89,11 +89,11 @@ const evalSimpC = (function () {
                 })
                 if (!chars.done()) {
                     console.error(`line: '${line}'`)
-                    throw new Error(`nothing should come after ;`)
+                    throw new SimpCError(`nothing should come after ;`)
                 }
             } else {
                 console.error(`line: '${line}'`)
-                throw new Error(`unknown char '${c}'`)
+                throw new SimpCError(`unknown char '${c}'`)
             }
         }
 
@@ -112,7 +112,7 @@ const evalSimpC = (function () {
             if (hint !== undefined) {
                 console.error("hint:", hint)
             }
-            throw new Error("CompileError: unexpected end of line")
+            throw new SimpCError("CompileError: unexpected end of line")
         }
     }
 
@@ -154,12 +154,12 @@ const evalSimpC = (function () {
 
             const identifier = tokenline.consume()
             if (identifier.type !== "word") {
-                throw new Error("SyntaxError: expected word")
+                throw new SimpCError("SyntaxError: expected word")
             }
 
             const equal = tokenline.consume()
             if (equal.type !== "operator" || equal.value !== "=") {
-                throw new Error("SyntaxError: expected equal")
+                throw new SimpCError("SyntaxError: expected equal")
             }
 
             const typedvalue = evalExpr(tokenline, memory)
@@ -171,7 +171,7 @@ const evalSimpC = (function () {
 
         if (first.type !== 'word') {
             console.error(first)
-            throw new Error("SyntaxError: invalid first token")
+            throw new SimpCError("SyntaxError: invalid first token")
         }
 
         if (istype(first.value)) {
@@ -187,7 +187,7 @@ const evalSimpC = (function () {
             const identifier = tokenline.consume()
             if (identifier.type !== "word") {
                 console.error(identifier)
-                throw new Error("SyntaxError: expected identifier (type word)")
+                throw new SimpCError("SyntaxError: expected identifier (type word)")
             }
 
             noeol(tokenline)
@@ -201,7 +201,7 @@ const evalSimpC = (function () {
 
             if (equal.type !== "operator" || equal.value !== "=") {
                 console.error(equal)
-                throw new Error("SyntaxError: expected equal token")
+                throw new SimpCError("SyntaxError: expected equal token")
             }
             const typedvalue = evalExpr(tokenline, memory)
 
@@ -220,7 +220,7 @@ const evalSimpC = (function () {
             assert(equal.type === "operator")
             assert(equal.value === "=")
             if (!memory.hasIdentifier(first.value)) {
-                throw new Error(`unknown variable ${first.value}`)
+                throw new SimpCError(`unknown variable ${first.value}`)
             }
 
             const typedvalue = evalExpr(tokenline, memory)

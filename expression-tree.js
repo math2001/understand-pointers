@@ -21,11 +21,11 @@ const buildExpressionTree = (function () {
             return parseExpr(tokenline, 0)
         } if (token.type === 'operator' && token.value === "-") {
             if (reachedEnd(tokenline)) {
-                throw new Error("unexpected end of expression after -")
+                throw new SimpCError("unexpected end of expression after -")
             }
             const number = tokenline.consume()
             if (number.type !== "number") {
-                throw new Error("expected number of negative sign")
+                throw new SimpCError("expected number of negative sign")
             }
 
             return {
@@ -39,12 +39,12 @@ const buildExpressionTree = (function () {
             }
         } else if (token.type === "operator" && token.value === "&") {
             if (reachedEnd(tokenline)) {
-                throw new Error("unexpected end of expression after &")
+                throw new SimpCError("unexpected end of expression after &")
             }
 
             const variable = tokenline.consume()
             if (variable.type !== "word") {
-                throw new Error("expected identifier after &")
+                throw new SimpCError("expected identifier after &")
             }
 
             return {
@@ -57,7 +57,7 @@ const buildExpressionTree = (function () {
                 tokenline.consume()
 
                 if (reachedEnd(tokenline)) {
-                    throw new Error("unexpected end of expression after * (dereferencing pointer)")
+                    throw new SimpCError("unexpected end of expression after * (dereferencing pointer)")
                 }
 
                 dereferenceCount++;
@@ -65,7 +65,7 @@ const buildExpressionTree = (function () {
 
             const identifier = tokenline.consume()
             if (identifier.type !== "word") {
-                throw new Error("expected identifier after * (dereferencing pointer)")
+                throw new SimpCError("expected identifier after * (dereferencing pointer)")
             }
 
             return {
@@ -83,10 +83,10 @@ const buildExpressionTree = (function () {
         const operator = tokenline.consume()
         if (operator.type !== "operator") {
             console.error(operator)
-            throw new Error("CompileError: expected operator")
+            throw new SimpCError("CompileError: expected operator")
         }
         if (tokenline.done()) {
-            throw new Error("CompileError: unexpected eol")
+            throw new SimpCError("CompileError: unexpected eol")
         }
 
         const right = parseExpr(tokenline, getBindingPower(operator.value))
@@ -123,7 +123,7 @@ const evalExpressionTree = (function () {
         assert(typeof right.type === "string")
         if (left.type !== right.type) {
             console.error(left, right)
-            throw new Error("dismatching types")
+            throw new SimpCError("dismatching types")
         }
     }
 
@@ -140,7 +140,7 @@ const evalExpressionTree = (function () {
             if (node.type === "word") {
                 // identifier
                 if (!memory.hasIdentifier(node.value)) {
-                    throw new Error(`unknown variable ${node.value}`)
+                    throw new SimpCError(`unknown variable ${node.value}`)
                 }
 
                 return memory.getTypedValue(node.value)
@@ -150,7 +150,7 @@ const evalExpressionTree = (function () {
                 return node
             } else if (node.type === "pointer") {
                 if (!memory.hasIdentifier(node.variable)) {
-                    throw new Error(`unknown variable ${node.variable}`)
+                    throw new SimpCError(`unknown variable ${node.variable}`)
                 }
                 return memory.getTypedPointerTo(node.variable)
             } else if (node.type === "dereference") {
@@ -178,7 +178,7 @@ const evalExpressionTree = (function () {
                     value: left.value + right.value
                 }
             } else {
-                throw new Error(`operator '+' not implemented for '${left.type}'`)
+                throw new SimpCError(`operator '+' not implemented for '${left.type}'`)
             }
         } else if (node.operator === "-") {
             requireMatchingType(left, right)
@@ -188,7 +188,7 @@ const evalExpressionTree = (function () {
                     value: left.value - right.value
                 }
             } else {
-                throw new Error(`operator '-' not implemented for '${left.type}'`)
+                throw new SimpCError(`operator '-' not implemented for '${left.type}'`)
             }
         } else if (node.operator === "*") {
             requireMatchingType(left, right)
@@ -198,7 +198,7 @@ const evalExpressionTree = (function () {
                     value: left.value * right.value
                 }
             } else {
-                throw new Error(`operator '*' not implemented for '${left.type}'`)
+                throw new SimpCError(`operator '*' not implemented for '${left.type}'`)
             }
         } else if (node.operator === "/") {
             requireMatchingType(left, right)
@@ -208,10 +208,10 @@ const evalExpressionTree = (function () {
                     value: Math.trunc(left / right)
                 }
             } else {
-                throw new Error(`operator '/' not implemented for '${left.type}'`)
+                throw new SimpCError(`operator '/' not implemented for '${left.type}'`)
             }
         } else {
-            throw new Error(`'unknown operator: ${node.operator}`)
+            throw new SimpCError(`'unknown operator: ${node.operator}`)
         }
     }
 })()

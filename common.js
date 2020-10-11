@@ -65,3 +65,6 @@ function getTextNodeAtPosition(root, index) {
         position: index
     };
 }
+
+class SimpCError extends Error {
+}

@@ -139,6 +139,17 @@ h1 {
   width: 54px;
 }
 
+.output {
+  margin: 24px 0;
+}
+
+.output .error {
+  background-color: #ffe3e0;
+  color: #c0392b;
+  padding: 4px 12px;
+  margin: 12px 0;
+}
+
 footer {
   text-align: center;
 }
