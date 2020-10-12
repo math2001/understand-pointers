@@ -373,6 +373,12 @@ class Editor {
         this._render()
     }
 
+    setContent(string) {
+        this.content = Array.from(string)
+        this.caret = this.content.length
+        this._render()
+    }
+
     _getPositionOfWordLeft(start) {
         assert(start >= 0)
         assert(start <= this.content.length)
