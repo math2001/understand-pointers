@@ -1,4 +1,3 @@
-
 const META_KEY = 1
 const CTRL_KEY = 2
 const ALT_KEY = 4
@@ -16,6 +15,7 @@ class Editor {
         })
 
         this.editor.addEventListener("keydown", e => {
+            e.preventDefault()
             let mods = 0
 
             if (e.ctrlKey) mods |= CTRL_KEY
@@ -69,7 +69,6 @@ class Editor {
                 keys.push(e.key)
                 console.log(keys.join("+"))
             }
-
         })
         this.caret = parseInt(localStorage.getItem('editor-caret')) || 0
 
@@ -290,6 +289,10 @@ class Editor {
 
     focus() {
         this.editor.focus()
+    }
+
+    blur() {
+        this.editor.blur()
     }
 
     _render() {
