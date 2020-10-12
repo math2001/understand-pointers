@@ -50,11 +50,21 @@ class Editor {
                 this.origin = null
                 this.moveLineDown()
             } else if (mods === 0 && e.key == "ArrowLeft") {
-                this.origin = null
-                this.moveCharLeft()
+                if (this.origin !== null) {
+                    this.caret = Math.min(this.caret, this.origin)
+                    this.origin = null
+                    this._render()
+                } else {
+                    this.moveCharLeft()
+                }
             } else if (mods === 0 && e.key == "ArrowRight") {
-                this.origin = null
-                this.moveCharRight()
+                if (this.origin !== null) {
+                    this.caret = Math.max(this.caret, this.origin)
+                    this.origin = null
+                    this._render()
+                } else {
+                    this.moveCharRight()
+                }
             }
 
             else if (mods === SHIFT_KEY && e.key == "ArrowUp") {
