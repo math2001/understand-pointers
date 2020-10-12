@@ -512,7 +512,7 @@ class Editor {
     _isWordChar(char) {
         assert(char.length === 1)
         const code = char.charCodeAt(0)
-        return ('A'.charCodeAt(0) <= code && code <= 'Z'.charCodeAt(0)) || ('a'.charCodeAt(0) <= code && code <= 'z'.charCodeAt(0))
+        return ('A'.charCodeAt(0) <= code && code <= 'Z'.charCodeAt(0)) || ('a'.charCodeAt(0) <= code && code <= 'z'.charCodeAt(0)) || ('0'.charCodeAt(0) <= code && code <= '9'.charCodeAt(0))
     }
 
     _computeGlyphSize() {
