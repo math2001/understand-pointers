@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./editor.css" />
+    <title>Editor</title>
+    <style>
+      body {
+        background-color: #ecf0f1;
+        font-family: "Ubuntu";
+      }
+
+      .content {
+        width: 640px;
+        font-family: "Roboto Mono", monospace;
+        margin: auto;
+        background-color: white;
+        position: relative;
+        height: 480px;
+      }
+
+      h1 {
+        text-align: center;
+      }
+
+      .editor {
+        width: 640px;
+        height: 480px;
+        border: 1px solid #aaa;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Editor</h1>
+
+    <main class="content">
+      <pre class="editor" id="editor" tabindex="0"></pre>
+    </main>
+
+    <script>
+      const assert = (condition) => {
+        if (typeof condition !== "boolean") {
+          console.error(condition, typeof condition);
+          throw new Error("expected boolean");
+        }
+        if (!condition) {
+          throw new Error("assertion error");
+        }
+      };
+    </script>
+    <script src="./editor.js"></script>
+    <script>
+      let editor = new Editor(document.querySelector("#editor"));
+      editor.focus();
+    </script>
+  </body>
+</html>

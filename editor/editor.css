@@ -1,0 +1,15 @@
+.editor {
+  font-family: "Roboto Mono";
+}
+
+.editor.editor-focus {
+  border-color: #333;
+}
+
+.editor .editor-caret {
+  height: 20px;
+  width: 2px;
+  background-color: #333;
+  display: inline-block;
+  position: absolute;
+}
