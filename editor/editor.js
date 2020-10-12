@@ -394,7 +394,7 @@ class Editor {
             shift++;
         }
 
-        assert(start + shift < this.content.length)
+        assert(start + shift <= this.content.length)
         return start + shift;
 
     }
