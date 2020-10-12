@@ -25,6 +25,9 @@ class Editor {
         this.inserCharAtCaret(e.key);
       } else if (mods === 0 && e.key == "Enter") {
         this.inserCharAtCaret("\n");
+      } else if (mods === 0 && e.key === "Tab") {
+        e.preventDefault();
+        this.insertTextAtCaret("    ");
       }
 
       // deleting
@@ -198,12 +201,30 @@ class Editor {
     this._render();
   }
 
+  insertTextAtCaret(text) {
+    this.content.splice(this.caret, 0, ...text);
+    this.caret += text.length;
+    this._render();
+  }
+
   removeCharAtCaret() {
     if (this.origin !== null) {
       this.removeSelection();
       return;
     }
     if (this.caret === 0) return;
+    if (
+      this.caret - 4 >= 0 &&
+      this.content[this.caret - 1] === " " &&
+      this.content[this.caret - 2] === " " &&
+      this.content[this.caret - 3] === " " &&
+      this.content[this.caret - 4] === " "
+    ) {
+      this.content.splice(this.caret - 4, 4);
+      this.caret -= 4;
+      this._render();
+      return;
+    }
     this.content.splice(this.caret - 1, 1);
     this.caret--;
     this._render();
