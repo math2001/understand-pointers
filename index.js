@@ -130,7 +130,9 @@ document.addEventListener("DOMContentLoaded", _ => {
 
                 if (this.memory[identifier].pointerArrow !== undefined) {
                     description.addEventListener('mouseenter', () => {
-                        this.memory[identifier].pointerArrow.show()
+                        // not a null pointer
+                        if (this.memory[identifier].typedvalue.value !== null)
+                            this.memory[identifier].pointerArrow.show()
                     })
                     description.addEventListener('mouseleave', () => {
                         this.memory[identifier].pointerArrow.hide()
@@ -191,14 +193,15 @@ document.addEventListener("DOMContentLoaded", _ => {
             assert(this.memory[identifier] !== undefined)
             assert(this.memory[identifier].pointerArrow !== undefined)
 
-            if (this.memory[identifier].typedvalue.value === null) {
-                // null pointer
-                return
-            }
-
             if (this.memory[identifier].pointerArrow === null) {
                 this.memory[identifier].pointerArrow = new Arrow()
             }
+
+            if (this.memory[identifier].typedvalue.value === null) {
+                this.memory[identifier].pointerArrow.hide()
+                return
+            }
+
             const pointerCell = this._getCellElement(this.memory[identifier].position)
             const pointerDescription = pointerCell.querySelector('.memory-description')
             assert(pointerDescription !== null)
