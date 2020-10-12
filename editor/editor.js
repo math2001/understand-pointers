@@ -19,6 +19,9 @@ class Editor {
             if (e.shiftKey) mods |= SHIFT_KEY
 
             if ((mods === 0 || mods === SHIFT_KEY) && e.key.length == 1) {
+                if (this.origin !== null) {
+                    this.removeSelection()
+                }
                 this.inserCharAtCaret(e.key)
             } else if (mods === 0 && e.key == "Enter") {
                 this.inserCharAtCaret('\n')
