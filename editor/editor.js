@@ -95,8 +95,18 @@ class Editor {
             }
 
             else if (mods === 0 && e.key == "End") {
+                this.origin = null
                 this.moveToEndOfLine()
             } else if (mods === 0 && e.key == "Home") {
+                this.origin = null
+                this.moveToStartOfLine()
+            }
+
+            else if (mods === SHIFT_KEY && e.key == "End") {
+                if (this.origin === null) this.origin = this.caret
+                this.moveToEndOfLine()
+            } else if (mods === SHIFT_KEY && e.key == "Home") {
+                if (this.origin === null) this.origin = this.caret
                 this.moveToStartOfLine()
             }
 
