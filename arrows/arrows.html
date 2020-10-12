@@ -1,149 +1,138 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset="utf-8">
+  <head>
+    <meta charset="utf-8" />
     <title>Arrows</title>
-    <link rel="stylesheet" type="text/css" href="arrows.css">
+    <link rel="stylesheet" type="text/css" href="arrows.css" />
     <style type="text/css">
-        body {
-            background-color: #ecf0f1;
-            font-family: 'Ubuntu';
-        }
+      body {
+        background-color: #ecf0f1;
+        font-family: "Ubuntu";
+      }
 
-        .content {
-            width: 640px;
-            font-family: "Roboto Mono", monospace;
-            margin: auto;
-            background-color: white;
-            position: relative;
-            height: 480px;
-        }
+      .content {
+        width: 640px;
+        font-family: "Roboto Mono", monospace;
+        margin: auto;
+        background-color: white;
+        position: relative;
+        height: 480px;
+      }
 
-        h1 {
-            text-align: center;
-        }
+      h1 {
+        text-align: center;
+      }
 
-        .box {
-            border: 1px solid #2c3e50;
-            width: 128px;
-            height: 128px;
-            position: absolute;
-            top: 0;
-            left: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: #bdc3c7;
-            user-select: none;
-        }
+      .box {
+        border: 1px solid #2c3e50;
+        width: 128px;
+        height: 128px;
+        position: absolute;
+        top: 0;
+        left: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #bdc3c7;
+        user-select: none;
+      }
 
-        .box.dragged {
-            background-color: #95a5a6;
-        }
+      .box.dragged {
+        background-color: #95a5a6;
+      }
 
-        #a {
-            left: 96px;
-            top: 64px;
-        }
+      #a {
+        left: 96px;
+        top: 64px;
+      }
 
-        #b {
-            left: 512px;
-            top: 320px;
-            width: 64px;
-            height: 64px;
-        }
+      #b {
+        left: 512px;
+        top: 320px;
+        width: 64px;
+        height: 64px;
+      }
 
-        .buttons {
-            text-align: center;
-        }
+      .buttons {
+        text-align: center;
+      }
 
-        input[type="checkbox"] {
-            vertical-align: middle;
-        }
-
+      input[type="checkbox"] {
+        vertical-align: middle;
+      }
     </style>
-</head>
-<body>
-
+  </head>
+  <body>
     <h1>Arrow</h1>
     <p class="buttons">
-        <button id="connect">Connect</button>
-        <button id="destroy">Destroy arrow</button>
-        <input type="checkbox" id="only-show-on-hover"> <label for="only-show-on-hover">Only show on hover</label>
+      <button id="connect">Connect</button>
+      <button id="destroy">Destroy arrow</button>
+      <input type="checkbox" id="only-show-on-hover" />
+      <label for="only-show-on-hover">Only show on hover</label>
     </p>
 
     <section class="content">
-        <div class="box draggable" id="a">
-            A
-        </div>
-        <div class="box draggable" id="b">
-            B
-        </div>
+      <div class="box draggable" id="a">A</div>
+      <div class="box draggable" id="b">B</div>
     </section>
 
     <script src="draggable.js"></script>
     <script src="arrows.js"></script>
     <script>
-        let arrow = null;
-        document.addEventListener("DOMContentLoaded", _ => {
-            const onlyShowOnHover = document.querySelector("#only-show-on-hover")
-            const a = document.querySelector("#a")
-            const b = document.querySelector("#b")
+      let arrow = null;
+      document.addEventListener("DOMContentLoaded", (_) => {
+        const onlyShowOnHover = document.querySelector("#only-show-on-hover");
+        const a = document.querySelector("#a");
+        const b = document.querySelector("#b");
 
-            arrow = new Arrow()
-            arrow.connect(a, b);
+        arrow = new Arrow();
+        arrow.connect(a, b);
 
-            document.addEventListener('mousemove', e => {
-                if (arrow !== null)
-                    arrow.connect(a, b)
-            })
+        document.addEventListener("mousemove", (e) => {
+          if (arrow !== null) arrow.connect(a, b);
+        });
 
-            document.querySelector('#destroy').addEventListener('click', e => {
-                e.preventDefault()
-                arrow.destroy()
-                arrow = null;
-            })
+        document.querySelector("#destroy").addEventListener("click", (e) => {
+          e.preventDefault();
+          arrow.destroy();
+          arrow = null;
+        });
 
-            document.querySelector('#connect').addEventListener('click', e => {
-                e.preventDefault()
-                if (arrow !== null) {
-                    alert('Already connected')
-                }
-                arrow = new Arrow()
-                arrow.connect(a, b)
+        document.querySelector("#connect").addEventListener("click", (e) => {
+          e.preventDefault();
+          if (arrow !== null) {
+            alert("Already connected");
+          }
+          arrow = new Arrow();
+          arrow.connect(a, b);
 
-                if (onlyShowOnHover.checked === true) {
-                    arrow.hide()
-                }
-            })
+          if (onlyShowOnHover.checked === true) {
+            arrow.hide();
+          }
+        });
 
-            onlyShowOnHover.addEventListener('change', e => {
-                if (arrow === null) return
-                if (onlyShowOnHover.checked === true) {
-                    arrow.hide()
-                } else {
-                    arrow.show()
-                }
-            })
+        onlyShowOnHover.addEventListener("change", (e) => {
+          if (arrow === null) return;
+          if (onlyShowOnHover.checked === true) {
+            arrow.hide();
+          } else {
+            arrow.show();
+          }
+        });
 
-            if (onlyShowOnHover.checked === true) {
-                arrow.hide()
-            } else {
-                arrow.show()
-            }
+        if (onlyShowOnHover.checked === true) {
+          arrow.hide();
+        } else {
+          arrow.show();
+        }
 
-            a.addEventListener('mouseenter', e => {
-                arrow.show()
-            })
-            a.addEventListener('mouseleave', e => {
-                if (onlyShowOnHover.checked)
-                    arrow.hide()
-            })
-
-        })
-
-
+        a.addEventListener("mouseenter", (e) => {
+          arrow.show();
+        });
+        a.addEventListener("mouseleave", (e) => {
+          if (onlyShowOnHover.checked) arrow.hide();
+        });
+      });
     </script>
-
-</body>
+  </body>
 </html>
