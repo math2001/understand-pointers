@@ -391,6 +391,7 @@ document.addEventListener("DOMContentLoaded", _ => {
 
     const memoryView = select("#memory-view")
     const runlineButton = select("#run-line")
+    const runallButton = select("#run-all")
     const editor = select("#editor")
     const editorTextarea = select("#editor-textarea")
     const editorView = select("#editor-view")
@@ -436,6 +437,9 @@ document.addEventListener("DOMContentLoaded", _ => {
     }
 
     const addNewError = (line, error) => {
+        console.error(`line: '${line}'`)
+        console.error(error)
+
         let message = "Internal error, see console for more details"
         if (error instanceof SimpCError) {
             message = error.message
@@ -444,33 +448,41 @@ document.addEventListener("DOMContentLoaded", _ => {
         output.innerHTML += html
     }
 
-    const runSimpC = (line, memory) => {
-        try {
-            return evalSimpC(line, memory)
-        } catch (e) {
-            addNewError(line, e)
-            console.error(`line: '${line}'`)
-            console.error(e)
-            return true // just ran a meaningful line (stop execution)
-        }
-    }
-
-    runlineButton.addEventListener("click", e => {
-        e.preventDefault()
-
+    // returns true if there are more lines to run
+    const runLine = () => {
         activeLineIndex++
         const lines = sourcecode.split('\n')
         if (activeLineIndex >= lines.length) {
             activeLineIndex = lines.length - 1
-            console.warn("no more lines to run")
-            return
+            return false
         }
 
         // runSimpC returns true if a meaningful line of code was run
-        while (activeLineIndex < lines.length && !runSimpC(lines[activeLineIndex], memory)) {
+        while (activeLineIndex < lines.length) {
+            let ranMeaningfulLine = false
+            try {
+                ranMeaningfulLine = evalSimpC(lines[activeLineIndex], memory)
+            } catch (e) {
+                addNewError(lines[activeLineIndex], e)
+                return false // no more lines to run, we got an error
+            }
+            if (ranMeaningfulLine) break
             activeLineIndex++
         }
+        return activeLineIndex < lines.length - 1
+    }
 
+    runlineButton.addEventListener("click", e => {
+        e.preventDefault()
+        runLine()
+        updateEditor()
+    })
+
+    runallButton.addEventListener('click', (e) => {
+        e.preventDefault()
+        while (runLine()) {
+            // runs the next line (runLine returns false when there are no more lines to run, or an error occurs)
+        }
         updateEditor()
     })
 
