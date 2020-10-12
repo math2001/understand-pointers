@@ -426,7 +426,7 @@ class Editor {
     rowColToIndex(row, col) {
         // if col is too large for that row, then index just points to the end of that line
         let index = 0;
-        while (index < this.content.length && row >= 0 && col >= 0) {
+        while (index < this.content.length && row + col > 0) {
             if (this.content[index] === '\n') {
                 if (row > 0) {
                     row--;
