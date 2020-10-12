@@ -44,18 +44,47 @@ class Editor {
             }
 
             else if (mods === 0 && e.key == "ArrowUp") {
+                this.origin = null
                 this.moveLineUp()
             } else if (mods === 0 && e.key == "ArrowDown") {
+                this.origin = null
                 this.moveLineDown()
             } else if (mods === 0 && e.key == "ArrowLeft") {
+                this.origin = null
                 this.moveCharLeft()
             } else if (mods === 0 && e.key == "ArrowRight") {
+                this.origin = null
+                this.moveCharRight()
+            }
+
+            else if (mods === SHIFT_KEY && e.key == "ArrowUp") {
+                if (this.origin === null) this.origin = this.caret
+                // otherwise, we *keep* the origin
+                this.moveLineUp()
+            } else if (mods === SHIFT_KEY && e.key == "ArrowDown") {
+                if (this.origin === null) this.origin = this.caret
+                this.moveLineDown()
+            } else if (mods === SHIFT_KEY && e.key === "ArrowLeft") {
+                if (this.origin === null) this.origin = this.caret
+                this.moveCharLeft()
+            } else if (mods === SHIFT_KEY && e.key === "ArrowRight") {
+                if (this.origin === null) this.origin = this.caret
                 this.moveCharRight()
             }
 
             else if (mods === CTRL_KEY && e.key === "ArrowLeft") {
+                this.origin = null
                 this.moveWordLeft()
             } else if (mods === CTRL_KEY && e.key === "ArrowRight") {
+                this.origin = null
+                this.moveWordRight()
+            }
+
+            else if (mods === CTRL_KEY | SHIFT_KEY && e.key === "ArrowLeft") {
+                if (this.origin === null) this.origin = this.caret
+                this.moveWordLeft()
+            } else if (mods === CTRL_KEY | SHIFT_KEY && e.key === "ArrowRight") {
+                if (this.origin === null) this.origin = this.caret
                 this.moveWordRight()
             }
 
@@ -68,6 +97,7 @@ class Editor {
                 if (e.metaKey) keys.push("meta")
                 if (e.ctrlKey) keys.push("ctrl")
                 if (e.altKey) keys.push("alt")
+                if (e.shiftKey) keys.push("shift")
                 keys.push(e.key)
                 console.log(keys.join("+"))
                 return
@@ -87,6 +117,7 @@ class Editor {
         })
 
         this.caret = parseInt(localStorage.getItem('editor-caret')) || 0
+        this.origin = null // origin of the selection. Setting it to null means no selection
 
         this._render()
     }
@@ -333,15 +364,22 @@ class Editor {
         assert(this.caret <= this.content.length)
         let html = ''
         const caretHTML = '<span class="editor-caret"></span>'
+        const selectionMin = Math.min(this.origin, this.caret)
+        const selectionMax = Math.max(this.origin, this.caret)
         for (let i = 0; i < this.content.length; i++) {
             if (i == this.caret) {
                 html += caretHTML
             }
+
             if (this.content[i] == '\n') {
                 html += '<br>'
+            } else if (this.origin !== null && selectionMin <= i && i < selectionMax) {
+                html += `<span class="editor-selection">${this.content[i]}</span>`
             } else {
                 html += this.content[i]
             }
+
+
         }
         if (this.caret === this.content.length) html += caretHTML
         this.editor.innerHTML = html
