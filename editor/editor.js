@@ -2,6 +2,7 @@ const META_KEY = 1
 const CTRL_KEY = 2
 const ALT_KEY = 4
 const SHIFT_KEY = 8
+const DBCLICK_TIMEOUT = 250
 
 class Editor {
     constructor(element) {
@@ -116,15 +117,18 @@ class Editor {
         })
 
         let startingMouseSelection = false
+        let lastMouseDownTime = 0
 
         this.editor.addEventListener('mousedown', e => {
-            const rect = this.editor.getBoundingClientRect()
-            const x = e.pageX - rect.left
-            const y = e.pageY - rect.top
-            const col = Math.trunc(x / this.glyphsize.width)
-            const row = Math.trunc(y / this.glyphsize.height)
+            if (Date.now() - lastMouseDownTime < DBCLICK_TIMEOUT) {
+                // double click
+                this.selectWordAround(this.caret)
+                return
+            }
 
-            this.caret = this.rowColToIndex(row, col)
+            lastMouseDownTime = Date.now()
+
+            this.caret = this.rowColToIndex(...this._getRowColFromClickEvent(e))
             this.origin = this.caret
             this._render()
             startingMouseSelection = true
@@ -142,10 +146,7 @@ class Editor {
                 return
             }
 
-            const col = Math.trunc(x / this.glyphsize.width)
-            const row = Math.trunc(y / this.glyphsize.height)
-
-            this.caret = this.rowColToIndex(row, col)
+            this.caret = this.rowColToIndex(...this._getRowColFromClickEvent(e))
             if (this.caret === this.origin) {
                 this.origin = null
             }
@@ -154,13 +155,8 @@ class Editor {
 
         this.editor.addEventListener('mousemove', e => {
             if (!startingMouseSelection) return
-            const rect = this.editor.getBoundingClientRect()
-            const x = e.pageX - rect.left
-            const y = e.pageY - rect.top
-            const col = Math.trunc(x / this.glyphsize.width)
-            const row = Math.trunc(y / this.glyphsize.height)
 
-            this.caret = this.rowColToIndex(row, col)
+            this.caret = this.rowColToIndex(...this._getRowColFromClickEvent(e))
             this._render()
         })
 
@@ -168,6 +164,15 @@ class Editor {
         this.origin = null // origin of the selection. Setting it to null means no selection
 
         this._render()
+    }
+
+    _getRowColFromClickEvent(e) {
+        const rect = this.editor.getBoundingClientRect()
+        const x = e.pageX - rect.left
+        const y = e.pageY - rect.top
+        const col = Math.round(x / this.glyphsize.width)
+        const row = Math.trunc(y / this.glyphsize.height)
+        return [row, col]
     }
 
     inserCharAtCaret(char) {
@@ -423,6 +428,29 @@ class Editor {
             index++
         }
         return index
+    }
+
+    selectWordAround(position) {
+        assert(position >= 0)
+        assert(position <= this.content.length)
+        let start, end;
+        if (this.content[position] === " ") {
+            start = position;
+            end = position;
+            while (start > 0 && this.content[start - 1] === " ") {
+                start--;
+            }
+            while (end < this.content.length && this.content[end] === " ") {
+                end++
+            }
+        } else {
+            start = this._getPositionOfWordLeft(position)
+            end = this._getPositionOfWordRight(position)
+        }
+
+        this.caret = end
+        this.origin = start
+        this._render()
     }
 
     _render() {
