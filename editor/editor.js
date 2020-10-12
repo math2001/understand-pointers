@@ -98,7 +98,13 @@ class Editor {
                 this.moveToEndOfLine()
             } else if (mods === 0 && e.key == "Home") {
                 this.moveToStartOfLine()
-            } else {
+            }
+
+            else if (mods === CTRL_KEY && e.key === "a") {
+                this.selectAll()
+            }
+
+            else {
                 let keys = []
                 if (e.metaKey) keys.push("meta")
                 if (e.ctrlKey) keys.push("ctrl")
@@ -348,6 +354,12 @@ class Editor {
         }
 
         this.content.splice(this.caret, shift)
+        this._render()
+    }
+
+    selectAll() {
+        this.origin = 0
+        this.caret = this.content.length
         this._render()
     }
 
