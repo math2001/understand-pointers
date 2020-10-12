@@ -115,10 +115,48 @@ class Editor {
             e.preventDefault()
         })
 
-        this.editor.addEventListener('click', e => {
-            const x = e.layerX
-            const y = e.layerY
+        let startingMouseSelection = false
 
+        this.editor.addEventListener('mousedown', e => {
+            const rect = this.editor.getBoundingClientRect()
+            const x = e.pageX - rect.left
+            const y = e.pageY - rect.top
+            const col = Math.trunc(x / this.glyphsize.width)
+            const row = Math.trunc(y / this.glyphsize.height)
+
+            this.caret = this.rowColToIndex(row, col)
+            this.origin = this.caret
+            this._render()
+            startingMouseSelection = true
+        })
+
+        document.addEventListener('mouseup', e => {
+            if (!startingMouseSelection) return
+            startingMouseSelection = false
+
+            const rect = this.editor.getBoundingClientRect()
+            const x = e.pageX - rect.left
+            const y = e.pageY - rect.top
+            // moused up outside the editor
+            if (x < 0 || y < 0 || x > rect.width || y > rect.height) {
+                return
+            }
+
+            const col = Math.trunc(x / this.glyphsize.width)
+            const row = Math.trunc(y / this.glyphsize.height)
+
+            this.caret = this.rowColToIndex(row, col)
+            if (this.caret === this.origin) {
+                this.origin = null
+            }
+            this._render()
+        })
+
+        this.editor.addEventListener('mousemove', e => {
+            if (!startingMouseSelection) return
+            const rect = this.editor.getBoundingClientRect()
+            const x = e.pageX - rect.left
+            const y = e.pageY - rect.top
             const col = Math.trunc(x / this.glyphsize.width)
             const row = Math.trunc(y / this.glyphsize.height)
 
