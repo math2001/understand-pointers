@@ -5,17 +5,19 @@ const SHIFT_KEY = 8
 
 class Editor {
     constructor(element) {
-        this.content = Array.from(localStorage.getItem('editor-content') || "")
         this.editor = element
+        this.glyphsize = this._computeGlyphSize()
+        this.content = Array.from(localStorage.getItem('editor-content') || "")
+
         this.editor.addEventListener("focus", e => {
             this.editor.classList.add("editor-focus")
         })
+
         this.editor.addEventListener("blur", e => {
             this.editor.classList.remove("editor-focus")
         })
 
         this.editor.addEventListener("keydown", e => {
-            e.preventDefault()
             let mods = 0
 
             if (e.ctrlKey) mods |= CTRL_KEY
@@ -68,8 +70,22 @@ class Editor {
                 if (e.altKey) keys.push("alt")
                 keys.push(e.key)
                 console.log(keys.join("+"))
+                return
             }
+            e.preventDefault()
         })
+
+        this.editor.addEventListener('click', e => {
+            const x = e.layerX
+            const y = e.layerY
+
+            const col = Math.trunc(x / this.glyphsize.width)
+            const row = Math.trunc(y / this.glyphsize.height)
+
+            this.caret = this.rowColToIndex(row, col)
+            this._render()
+        })
+
         this.caret = parseInt(localStorage.getItem('editor-caret')) || 0
 
         this._render()
@@ -295,6 +311,24 @@ class Editor {
         this.editor.blur()
     }
 
+    rowColToIndex(row, col) {
+        // if col is too large for that row, then index just points to the end of that line
+        let index = 0;
+        while (index < this.content.length && row >= 0 && col >= 0) {
+            if (this.content[index] === '\n') {
+                if (row > 0) {
+                    row--;
+                } else {
+                    // we reached the end of the line we want to be one, return
+                    return index
+                }
+            }
+            if (row === 0) col--
+            index++
+        }
+        return index
+    }
+
     _render() {
         assert(this.caret <= this.content.length)
         let html = ''
@@ -320,6 +354,20 @@ class Editor {
         assert(char.length === 1)
         const code = char.charCodeAt(0)
         return ('A'.charCodeAt(0) <= code && code <= 'Z'.charCodeAt(0)) || ('a'.charCodeAt(0) <= code && code <= 'z'.charCodeAt(0))
+    }
+
+    _computeGlyphSize() {
+        // assumes monospace font
+        const canvas = document.createElement('canvas')
+        const ctx = canvas.getContext('2d')
+
+        const style = window.getComputedStyle(this.editor, null)
+
+        ctx.font = `${style.fontSize} ${style.fontFamily}`
+        const width = ctx.measureText("a").width
+        const height = parseFloat(style.lineHeight)
+
+        return { width, height }
     }
 
 }
