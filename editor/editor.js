@@ -439,7 +439,7 @@ class Editor {
                 end++
             }
         } else {
-            start = this._getPositionOfWordLeft(position)
+            start = this._getPositionOfWordLeft(position + 1)
             end = this._getPositionOfWordRight(position)
         }
 
