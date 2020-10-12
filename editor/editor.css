@@ -4,6 +4,7 @@
   line-height: 1.5;
   user-select: none;
   cursor: text;
+  overflow: auto;
 }
 
 .editor:focus {
@@ -17,6 +18,11 @@
   background-color: #333;
   display: inline-block;
   position: absolute;
+}
+
+/* hack so that the carent doesn't affect the flow */
+.editor .editor-caret-parent {
+  position: relative;
 }
 
 .editor .editor-selection {

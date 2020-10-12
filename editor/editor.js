@@ -183,8 +183,8 @@ class Editor {
 
     _getRowColFromClickEvent(e) {
         const rect = this.editor.getBoundingClientRect()
-        const x = e.pageX - rect.left
-        const y = e.pageY - rect.top
+        const x = e.pageX + this.editor.scrollLeft - rect.left
+        const y = e.pageY + this.editor.scrollTop - rect.top
         const col = Math.round(x / this.glyphsize.width)
         const row = Math.trunc(y / this.glyphsize.height)
         return [row, col]
@@ -477,7 +477,7 @@ class Editor {
     _render() {
         assert(this.caret <= this.content.length)
         let html = ''
-        const caretHTML = '<span class="editor-caret"></span>'
+        const caretHTML = '<span class="editor-caret-parent"><span class="editor-caret"></span></span>'
         const selectionMin = Math.min(this.origin, this.caret)
         const selectionMax = Math.max(this.origin, this.caret)
         for (let i = 0; i < this.content.length; i++) {
