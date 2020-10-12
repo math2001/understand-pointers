@@ -130,13 +130,30 @@ class Editor {
     }
 
     removeCharAtCaret() {
+        if (this.origin !== null) {
+            this.removeSelection()
+            return
+        }
         if (this.caret === 0) return
         this.content.splice(this.caret - 1, 1)
         this.caret--;
         this._render()
     }
+
     removeCharAfterCaret() {
+        if (this.origin !== null) {
+            this.removeSelection()
+            return
+        }
         this.content.splice(this.caret, 1)
+        this._render()
+    }
+
+    removeSelection() {
+        assert(this.origin !== null)
+        this.content.splice(Math.min(this.caret, this.origin), Math.abs(this.caret - this.origin))
+        this.caret = Math.min(this.caret, this.origin)
+        this.origin = null
         this._render()
     }
 

@@ -3,6 +3,7 @@
   /* the line height used by JavaScript to determine the height of a glyph */
   line-height: 1.5;
   user-select: none;
+  cursor: text;
 }
 
 .editor.editor-focus {
