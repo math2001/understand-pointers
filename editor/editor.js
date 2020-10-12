@@ -503,6 +503,7 @@ class Editor {
         }
         if (this.caret === this.content.length) html += caretHTML
         this.editor.innerHTML = html
+        this.editor.querySelector(".editor-caret").scrollIntoView()
 
         localStorage.setItem("editor-caret", this.caret.toString(10))
         localStorage.setItem("editor-content", this.content.join(''))
