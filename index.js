@@ -130,8 +130,7 @@ document.addEventListener("DOMContentLoaded", _ => {
 
                 if (this.memory[identifier].pointerArrow !== undefined) {
                     description.addEventListener('mouseenter', () => {
-                        // not a null pointer
-                        if (this.memory[identifier].typedvalue.value !== null)
+                        if (this._pointsToValidMemoryCell(identifier))
                             this.memory[identifier].pointerArrow.show()
                     })
                     description.addEventListener('mouseleave', () => {
@@ -189,6 +188,17 @@ document.addEventListener("DOMContentLoaded", _ => {
             assert(false)
         }
 
+        _pointsToValidMemoryCell(identifier) {
+            assert(this.memory[identifier].typedvalue.type.endsWith("*"))
+
+            return (
+                // null pointer
+                this.memory[identifier].typedvalue.value !== null
+                // points to invalid memory cell
+                && this.symbols[this.memory[identifier].typedvalue.value] !== undefined
+            )
+        }
+
         _connectPointerArrow(identifier) {
             assert(this.memory[identifier] !== undefined)
             assert(this.memory[identifier].pointerArrow !== undefined)
@@ -197,7 +207,7 @@ document.addEventListener("DOMContentLoaded", _ => {
                 this.memory[identifier].pointerArrow = new Arrow()
             }
 
-            if (this.memory[identifier].typedvalue.value === null) {
+            if (!this._pointsToValidMemoryCell(identifier)) {
                 this.memory[identifier].pointerArrow.hide()
                 return
             }
