@@ -116,6 +116,7 @@ class Editor {
 
         this.editor.addEventListener('mousedown', e => {
             e.preventDefault()
+            this.editor.focus()
             if (Date.now() - lastMouseDownTime < DBCLICK_TIMEOUT) {
                 // double click
                 this.origin = this.caret
