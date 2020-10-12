@@ -44,6 +44,23 @@ document.addEventListener("DOMContentLoaded", _ => {
             return typesSize[type.slice(0, length)] !== undefined
         }
 
+        declare(identifer, type) {
+            let value;
+            if (type == "int") {
+                value = randint(-(1 << 15), (1 << 15))
+            } else if (type.endsWith("*")) {
+                value = randint(0, (1 << 8))
+            } else {
+                console.error(`couldn't randomize type ${type}`)
+                assert(false)
+            }
+
+            this.initialize(identifer, type, {
+                type: type,
+                value: value, // uninitialized
+            })
+        }
+
         initialize(identifier, type, typedvalue) {
             this.assertMatchingType(type, typedvalue)
 
@@ -234,7 +251,7 @@ document.addEventListener("DOMContentLoaded", _ => {
             assert(typedvalue.type === "int")
             assert(typeof typedvalue.value === "number")
 
-            assert(typedvalue.value <= 1 << (8 * typesSize['int'] - 1) - 1)
+            assert(typedvalue.value <= (1 << (8 * typesSize['int']) - 1) - 1)
             assert(typedvalue.value >= -(1 << (8 * typesSize['int'] - 1)))
 
             let bits;

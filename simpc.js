@@ -174,6 +174,7 @@ const evalSimpC = (function () {
 
         if (istype(first.value)) {
             // declare new variable
+            // int a;
             // int a = 10;
             let type = first.value;
             while (tokenline.peek().type === 'operator' && tokenline.peek().value === "*") {
@@ -193,7 +194,8 @@ const evalSimpC = (function () {
             const equal = tokenline.consume()
             if (equal.type === 'semicolon') {
                 assert(tokenline.done())
-                return
+                memory.declare(identifier.value, type)
+                return true
             }
             noeol(tokenline)
 

@@ -8,6 +8,9 @@ const assert = (condition) => {
     }
 }
 
+// returns x in [a, b)
+const randint = (a, b) => Math.trunc(Math.random() * (b - a) + a)
+
 const isdigit = char => {
     assert(char.length === 1)
     return char.charCodeAt(0) >= '0'.charCodeAt(0) && char.charCodeAt(0) <= '9'.charCodeAt(0)
