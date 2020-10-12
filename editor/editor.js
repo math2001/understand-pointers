@@ -180,19 +180,13 @@ class Editor {
         while (this.caret - shift > 0 && this.content[this.caret - shift - 1] === " ") {
             shift++
         }
-        this.caret -= shift
 
-        shift = 0
+        const negate = !this._isWordChar(this.content[this.caret - shift - 1])
+
         // if we aren't on a word char, then consume all the non word char
-        while (this.caret - shift > 0 && !this._isWordChar(this.content[this.caret - shift - 1])) {
-            shift++
-        }
-
         // otherwise, consume all the word char
-        if (shift === 0) {
-            while (this.caret - shift > 0 && (this._isWordChar(this.content[this.caret - shift - 1]))) {
-                shift++;
-            }
+        while (this.caret - shift > 0 && (this._isWordChar(this.content[this.caret - shift - 1]) ^ negate)) {
+            shift++
         }
 
         this.caret -= shift;
@@ -209,16 +203,12 @@ class Editor {
 
         shift = 0
 
-        // if we are not on a word char, the consume all the word char
-        while (this.caret + shift < this.content.length && !this._isWordChar(this.content[this.caret + shift])) {
-            shift++;
-        }
+        const negate = !this._isWordChar(this.content[this.caret + shift])
 
+        // if we aren't on a word char, then consume all the non word char
         // otherwise, consume all the word char
-        if (shift === 0) {
-            while (this.caret + shift < this.content.length && this._isWordChar(this.content[this.caret + shift])) {
-                shift++;
-            }
+        while (this.caret + shift < this.content.length && (this._isWordChar(this.content[this.caret + shift]) ^ negate)) {
+            shift++;
         }
 
         this.caret += shift;
