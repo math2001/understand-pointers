@@ -23,14 +23,22 @@ class Editor {
             if (e.altKey) mods |= ALT_KEY
             if (e.shiftKey) mods |= SHIFT_KEY
 
-            if (mods === 0 && e.key.length == 1) {
+            if ((mods === 0 || mods === SHIFT_KEY) && e.key.length == 1) {
                 this.inserCharAtCaret(e.key)
             } else if (mods === 0 && e.key == "Enter") {
                 this.inserCharAtCaret('\n')
-            } else if (mods === 0 && e.key == "Backspace") {
+            }
+
+            else if (mods === 0 && e.key == "Backspace") {
                 this.removeCharAtCaret()
             } else if (mods === 0 && e.key == "Delete") {
                 this.removeCharAfterCaret()
+            }
+
+            else if (mods === CTRL_KEY && e.key == "Backspace") {
+                this.removeWordAtCaret()
+            } else if (mods === CTRL_KEY && e.key == "Delete") {
+                this.removeWordAfterCaret()
             }
 
             else if (mods === 0 && e.key == "ArrowUp") {
@@ -175,6 +183,17 @@ class Editor {
     }
 
     moveWordLeft() {
+        this.caret = this._getPositionOfWordLeft(this.caret)
+        this._render()
+    }
+
+    moveWordRight() {
+        this.caret = this._getPositionOfWordRight(this.caret);
+        this._render()
+    }
+
+    removeWordAtCaret() {
+        if (this.caret === 0) return
         // consume all the spaces
         let shift = 0;
         while (this.caret - shift > 0 && this.content[this.caret - shift - 1] === " ") {
@@ -189,11 +208,13 @@ class Editor {
             shift++
         }
 
+        this.content.splice(this.caret - shift, shift)
         this.caret -= shift;
         this._render()
     }
 
-    moveWordRight() {
+    removeWordAfterCaret() {
+        if (this.caret === this.content.length) return
         // consume all the spaces
         let shift = 0;
         while (this.caret + shift < this.content.length && this.content[this.caret + shift] === " ") {
@@ -211,8 +232,60 @@ class Editor {
             shift++;
         }
 
-        this.caret += shift;
+        this.content.splice(this.caret, shift)
         this._render()
+    }
+
+    _getPositionOfWordLeft(start) {
+        assert(start >= 0)
+        assert(start <= this.content.length)
+
+        if (start === 0) return start
+
+        // consume all the spaces
+        let shift = 0;
+        while (start - shift > 0 && this.content[start - shift - 1] === " ") {
+            shift++
+        }
+
+        if (start - shift === 0) return 0
+
+        const negate = !this._isWordChar(this.content[start - shift - 1])
+
+        // if we aren't on a word char, then consume all the non word char
+        // otherwise, consume all the word char
+        while (start - shift > 0 && (this._isWordChar(this.content[start - shift - 1]) ^ negate)) {
+            shift++
+        }
+        assert(start - shift >= 0);
+        return start - shift;
+    }
+
+    _getPositionOfWordRight(start) {
+        assert(start >= 0)
+        assert(start <= this.content.length)
+
+        if (start === this.content.length) return this.content.length
+
+        // consume all the spaces
+        let shift = 0;
+        while (start + shift < this.content.length && this.content[start + shift] === " ") {
+            shift++
+        }
+
+        if (start + shift === this.content.length) return this.content.length
+
+        const negate = !this._isWordChar(this.content[start + shift])
+
+        // if we aren't on a word char, then consume all the non word char
+        // otherwise, consume all the word char
+        while (start + shift < this.content.length && (this._isWordChar(this.content[start + shift]) ^ negate)) {
+            shift++;
+        }
+
+        assert(start + shift < this.content.length)
+        return start + shift;
+
     }
 
     focus() {
