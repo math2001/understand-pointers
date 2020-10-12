@@ -6,7 +6,7 @@
   cursor: text;
 }
 
-.editor.editor-focus {
+.editor:focus {
   border-color: #333;
 }
 

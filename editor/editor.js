@@ -10,14 +10,6 @@ class Editor {
         this.glyphsize = this._computeGlyphSize()
         this.content = Array.from(localStorage.getItem('editor-content') || "")
 
-        this.editor.addEventListener("focus", e => {
-            this.editor.classList.add("editor-focus")
-        })
-
-        this.editor.addEventListener("blur", e => {
-            this.editor.classList.remove("editor-focus")
-        })
-
         this.editor.addEventListener("keydown", e => {
             let mods = 0
 
@@ -120,8 +112,10 @@ class Editor {
         let lastMouseDownTime = 0
 
         this.editor.addEventListener('mousedown', e => {
+            e.preventDefault()
             if (Date.now() - lastMouseDownTime < DBCLICK_TIMEOUT) {
                 // double click
+                this.origin = this.caret
                 this.selectWordAround(this.caret)
                 return
             }
@@ -135,6 +129,7 @@ class Editor {
         })
 
         document.addEventListener('mouseup', e => {
+            e.preventDefault()
             if (!startingMouseSelection) return
             startingMouseSelection = false
 
