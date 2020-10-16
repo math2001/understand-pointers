@@ -9,6 +9,7 @@ class Editor {
     this.editor = element;
     this.glyphsize = this._computeGlyphSize();
     this.content = Array.from(localStorage.getItem("editor-content") || "");
+    this.highlightLine = -1;
 
     this.editor.addEventListener("keydown", (e) => {
       let mods = 0;
@@ -537,6 +538,11 @@ class Editor {
     this._render();
   }
 
+  setHighlightLine(line) {
+    this.highlightLine = line;
+    this._render();
+  }
+
   _render() {
     assert(this.caret <= this.content.length);
     let html = "";
@@ -544,6 +550,11 @@ class Editor {
       '<span class="editor-caret-parent"><span class="editor-caret"></span></span>';
     const selectionMin = Math.min(this.origin, this.caret);
     const selectionMax = Math.max(this.origin, this.caret);
+    let lineCount = 0;
+    let closedHighlight = false;
+    if (this.highlightLine === 0) {
+      html += '<span class="editor-highlight">';
+    }
     for (let i = 0; i < this.content.length; i++) {
       if (i == this.caret) {
         html += caretHTML;
@@ -551,6 +562,13 @@ class Editor {
 
       if (this.content[i] == "\n") {
         html += "<br>";
+        lineCount++;
+        if (lineCount === this.highlightLine) {
+          html += '<span class="editor-highlight">';
+        } else if (lineCount === this.highlightLine + 1) {
+          html += "</span>";
+          closedHighlight = true;
+        }
       } else if (
         this.origin !== null &&
         selectionMin <= i &&
@@ -561,6 +579,11 @@ class Editor {
         html += this.content[i];
       }
     }
+
+    if (!closedHighlight) {
+      html += "</span>";
+    }
+
     if (this.caret === this.content.length) html += caretHTML;
     this.editor.innerHTML = html;
     this.editor.querySelector(".editor-caret").scrollIntoView();

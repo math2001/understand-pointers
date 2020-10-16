@@ -28,3 +28,8 @@
 .editor .editor-selection {
   background-color: #bad8ec;
 }
+
+.editor .editor-highlight {
+  background-color: #f1c40f;
+  display: block;
+}
