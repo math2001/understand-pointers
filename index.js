@@ -474,6 +474,7 @@ document.addEventListener("DOMContentLoaded", (_) => {
 
   runlineButton.addEventListener("click", (e) => {
     e.preventDefault();
+    editor.save();
     removeActiveLineHighlight();
     runLine();
     addActiveLineHighlight();
@@ -482,6 +483,7 @@ document.addEventListener("DOMContentLoaded", (_) => {
   runallButton.addEventListener("click", (e) => {
     e.preventDefault();
     removeActiveLineHighlight();
+    editor.save();
     while (runLine()) {
       // runs the next line (runLine returns false when there are no more lines to run, or an error occurs)
     }
