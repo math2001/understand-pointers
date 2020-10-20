@@ -404,48 +404,21 @@ document.addEventListener("DOMContentLoaded", (_) => {
   const memoryView = select("#memory-view");
   const runlineButton = select("#run-line");
   const runallButton = select("#run-all");
-  const editor = select("#editor");
-  const editorTextarea = select("#editor-textarea");
-  const editorView = select("#editor-view");
+  const editor = CodeMirror.fromTextArea(document.querySelector("#editor"), {});
   const output = select("#output");
 
   const memoryTable = document.createElement("table");
   memoryTable.classList.add("memory-table");
 
   let activeLineIndex = -1;
-  let sourcecode = editorTextarea.value;
-
-  const updateEditor = () => {
-    assert(activeLineIndex >= -1);
-
-    const start = editorTextarea.selectionStart;
-    const end = editorTextarea.selectionEnd;
-
-    let html = sourcecode;
-    html =
-      html.slice(0, start) + '<span class="cursor"></span>' + html.slice(start);
-
-    const lines = html.split("\n");
-    assert(activeLineIndex <= lines.length);
-
-    if (activeLineIndex < lines.length) {
-      for (let i = 0; i < lines.length; i++) {
-        if (i === activeLineIndex) {
-          lines[i] = '<span class="highlight line">' + lines[i] + "</span>";
-        }
-      }
-    }
-
-    html = lines.join("<br/>");
-
-    editorView.innerHTML = html;
-  };
 
   const resetExecution = () => {
-    sourcecode = editorTextarea.value;
+    if (activeLineIndex >= 0) {
+      editor.removeLineClass(activeLineIndex, "background", "highlight");
+    }
+
     activeLineIndex = -1;
     memory.clear();
-    updateEditor();
     output.innerHTML = "";
   };
 
@@ -464,7 +437,7 @@ document.addEventListener("DOMContentLoaded", (_) => {
   // returns true if there are more lines to run
   const runLine = () => {
     activeLineIndex++;
-    const lines = sourcecode.split("\n");
+    const lines = editor.getValue().split("\n");
     if (activeLineIndex >= lines.length) {
       activeLineIndex = lines.length - 1;
       return false;
@@ -485,39 +458,34 @@ document.addEventListener("DOMContentLoaded", (_) => {
     return activeLineIndex < lines.length - 1;
   };
 
+  const removeActiveLineHighlight = () => {
+    if (activeLineIndex >= 0)
+      editor.removeLineClass(activeLineIndex, "background", "highlight");
+  };
+
+  const addActiveLineHighlight = () => {
+    assert(activeLineIndex >= 0);
+    editor.addLineClass(activeLineIndex, "background", "highlight");
+  };
+
+  editor.on("changes", (e) => {
+    resetExecution();
+  });
+
   runlineButton.addEventListener("click", (e) => {
     e.preventDefault();
+    removeActiveLineHighlight();
     runLine();
-    updateEditor();
+    addActiveLineHighlight();
   });
 
   runallButton.addEventListener("click", (e) => {
     e.preventDefault();
+    removeActiveLineHighlight();
     while (runLine()) {
       // runs the next line (runLine returns false when there are no more lines to run, or an error occurs)
     }
-    updateEditor();
-  });
-
-  editorTextarea.addEventListener("input", (e) => {
-    resetExecution();
-  });
-
-  editorTextarea.addEventListener("select", (e) => {
-    updateEditor();
-  });
-
-  editorTextarea.addEventListener("keydown", (e) => {
-    // motherfucking horrible. But there is no other option
-    setTimeout(updateEditor, 50);
-  });
-
-  editorTextarea.addEventListener("click", (e) => {
-    updateEditor();
-  });
-
-  editorTextarea.addEventListener("scroll", (e) => {
-    editorView.scrollTop = editorTextarea.scrollTop;
+    addActiveLineHighlight();
   });
 
   document.querySelector("#reset-exec").addEventListener("click", (e) => {
@@ -525,11 +493,8 @@ document.addEventListener("DOMContentLoaded", (_) => {
     resetExecution();
   });
 
-  updateEditor();
-
-  editor.focus();
-
   const memory = new Memory(memoryTable);
+  window.editor = editor;
 
   memoryView.innerHTML = "";
   memoryView.appendChild(memoryTable);

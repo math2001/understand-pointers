@@ -3,6 +3,12 @@
   <head>
     <meta charset="utf-8" />
     <title>Understanding pointers</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.1/codemirror.min.css"
+      integrity="sha512-xIf9AdJauwKIVtrVRZ0i4nHP61Ogx9fSRAkCLecmE2dL/U8ioWpDvFCAy4dcfecN72HHB9+7FfQj3aiO68aaaw=="
+      crossorigin="anonymous"
+    />
     <link rel="stylesheet" type="text/css" href="arrows/arrows.css" />
     <link rel="stylesheet" type="text/css" href="index.css" />
   </head>
@@ -22,9 +28,8 @@
       </section>
       <section class="split">
         <article class="code-view" id="code-view">
-          <div class="editor" id="editor">
-            <textarea id="editor-textarea" class="editor-textarea"></textarea>
-            <pre id="editor-view" class="editor-view"></pre>
+          <div class="editor">
+            <textarea id="editor"></textarea>
           </div>
         </article>
         <article class="memory-view" id="memory-view">
@@ -48,6 +53,10 @@
       </p>
     </footer>
 
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.1/codemirror.js"
+      crossorigin="anonymous"
+    ></script>
     <script src="common.js"></script>
     <script src="arrows/arrows.js"></script>
     <script src="expression-tree.js"></script>
