@@ -381,7 +381,7 @@ document.addEventListener("DOMContentLoaded", (_) => {
       if (oldtype === newtypedvalue.type) return;
 
       console.error(`type: ${oldtype}, typedvalue:`, newtypedvalue);
-      throw new Error(
+      throw new SimpCError(
         `mismatching type: variable is ${oldtype}, expression is ${newtypedvalue.type} (value: ${newtypedvalue.value})`
       );
     }
