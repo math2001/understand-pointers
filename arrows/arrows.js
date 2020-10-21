@@ -96,19 +96,35 @@ const Arrow = (function () {
       const pointTo = mindistancepoints[1];
 
       // take a longer path if the arrow is too small
+
+      // if too close horizontally
+      // go around the bottom (down, left/right, up instead of left/right)
+      // elif too close vertically
+      // go around the left (left, top/down, right instead of top/down)
       let tookLongerPath = false;
       if (
+        // too close horizontally
         (pointFrom.x === recta.left || pointFrom.x == recta.right) &&
         (pointTo.x === rectb.left || pointTo.x == rectb.right) &&
         Math.abs(pointFrom.x - pointTo.x) < 48
       ) {
+        tookLongerPath = true;
         pointFrom.x = recta.left + (recta.right - recta.left) / 2;
         pointFrom.y = recta.bottom;
         pointTo.x = rectb.left + (rectb.right - rectb.left) / 2;
         pointTo.y = rectb.bottom;
+      } else if (
+        // too close vertically
+        (pointFrom.y === recta.top || pointFrom.y === recta.bottom) &&
+        (pointTo.y === rectb.top || pointTo.y === rectb.bottom) &&
+        Math.abs(pointFrom.y - pointTo.y) < 48
+      ) {
         tookLongerPath = true;
+        pointFrom.x = recta.left;
+        pointFrom.y = recta.top + (recta.bottom - recta.top) / 2;
+        pointTo.x = rectb.left;
+        pointTo.y = rectb.top + (rectb.bottom - rectb.top) / 2;
       }
-
       // if we have distance = 0, then we use 1
       const horizontalDistance = Math.abs(pointFrom.x - pointTo.x) || 1;
       const verticalDistance = Math.abs(pointFrom.y - pointTo.y) || 1;
@@ -171,16 +187,29 @@ const Arrow = (function () {
         (pointTo.x === rectb.left || pointTo.x === rectb.right)
       ) {
         // console.log(1);
-        this.path.setAttributeNS(
-          null,
-          "d",
-          `
+        if (tookLongerPath) {
+          this.path.setAttributeNS(
+            null,
+            "d",
+            `
+              M ${svgFrom.x},${svgFrom.y}
+              L ${Math.min(svgFrom.x, svgTo.x) - 24},${svgFrom.y}
+              L ${Math.min(svgFrom.x, svgTo.x) - 24},${svgTo.y}
+              L ${svgTo.x + adjustment.x * 2},${svgTo.y + adjustment.y * 2}
+            `
+          );
+        } else {
+          this.path.setAttributeNS(
+            null,
+            "d",
+            `
                 M ${svgFrom.x},${svgFrom.y}
                 l ${Math.trunc((svgTo.x - svgFrom.x) / 2)},0
                 l 0,${svgTo.y - svgFrom.y}
                 L ${svgTo.x + adjustment.x * 2},${svgTo.y + adjustment.y * 2}
             `
-        );
+          );
+        }
       } else if (
         (pointFrom.y === recta.top || pointFrom.y === recta.bottom) &&
         (pointTo.y === rectb.top || pointTo.y === rectb.bottom)
@@ -211,6 +240,7 @@ const Arrow = (function () {
         }
       } else if (pointFrom.y === recta.top || pointFrom.y === recta.bottom) {
         // console.log(3);
+
         this.path.setAttributeNS(
           null,
           "d",
