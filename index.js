@@ -337,7 +337,8 @@ document.addEventListener("DOMContentLoaded", (_) => {
     }
 
     setTypedValueDereference(identifier, dereferenceCount, typedvalue) {
-      // sneaky but works
+      // sneaky but works. It makes sure, after dereferencing, we have the right
+      // type
       assert(
         typedvalue.type + "*".repeat(dereferenceCount) ===
           this.memory[identifier].typedvalue.type
@@ -347,6 +348,11 @@ document.addEventListener("DOMContentLoaded", (_) => {
       while (dereferenceCount > 0) {
         assert(this.memory[head] !== undefined);
         assert(this.memory[head].typedvalue.type.endsWith("*"));
+        if (this.memory[head].typedvalue.value === null) {
+          throw new SimpCError(
+            "null pointer dereference. You are doing something like *pointer where pointer = NULL"
+          );
+        }
         head = this.symbols[this.memory[head].typedvalue.value];
         assert(head !== undefined);
         dereferenceCount--;
