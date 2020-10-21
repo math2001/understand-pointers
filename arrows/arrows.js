@@ -72,6 +72,9 @@ const Arrow = (function () {
       const connectPointsA = this._getConnectPoints(recta);
       const connectPointsB = this._getConnectPoints(rectb);
 
+      // figure out which side is going to be connected to which side (we pick
+      // the side with the minimal euclidian distance)
+
       // only 16 possibilities, that's quick
       let mindistancepoints = [connectPointsA[0], connectPointsB[0]];
       for (let i = 0; i < connectPointsA.length; i++) {
@@ -91,6 +94,20 @@ const Arrow = (function () {
 
       const pointFrom = mindistancepoints[0];
       const pointTo = mindistancepoints[1];
+
+      // take a longer path if the arrow is too small
+      let tookLongerPath = false;
+      if (
+        (pointFrom.x === recta.left || pointFrom.x == recta.right) &&
+        (pointTo.x === rectb.left || pointTo.x == rectb.right) &&
+        Math.abs(pointFrom.x - pointTo.x) < 48
+      ) {
+        pointFrom.x = recta.left + (recta.right - recta.left) / 2;
+        pointFrom.y = recta.bottom;
+        pointTo.x = rectb.left + (rectb.right - rectb.left) / 2;
+        pointTo.y = rectb.bottom;
+        tookLongerPath = true;
+      }
 
       // if we have distance = 0, then we use 1
       const horizontalDistance = Math.abs(pointFrom.x - pointTo.x) || 1;
@@ -153,6 +170,7 @@ const Arrow = (function () {
         (pointFrom.x === recta.left || pointFrom.x === recta.right) &&
         (pointTo.x === rectb.left || pointTo.x === rectb.right)
       ) {
+        // console.log(1);
         this.path.setAttributeNS(
           null,
           "d",
@@ -167,17 +185,32 @@ const Arrow = (function () {
         (pointFrom.y === recta.top || pointFrom.y === recta.bottom) &&
         (pointTo.y === rectb.top || pointTo.y === rectb.bottom)
       ) {
-        this.path.setAttributeNS(
-          null,
-          "d",
-          `
+        // console.log(2);
+        if (tookLongerPath) {
+          this.path.setAttributeNS(
+            null,
+            "d",
+            `
+              M ${svgFrom.x},${svgFrom.y}
+              L ${svgFrom.x},${Math.max(svgFrom.y, svgTo.y) + 24}
+              L ${svgTo.x},${Math.max(svgFrom.y, svgTo.y) + 24}
+              L ${svgTo.x + adjustment.x * 2},${svgTo.y + adjustment.y * 2}
+            `
+          );
+        } else {
+          this.path.setAttributeNS(
+            null,
+            "d",
+            `
                 M ${svgFrom.x},${svgFrom.y}
                 l 0,${Math.trunc((svgTo.y - svgFrom.y) / 2)}
                 l ${svgTo.x - svgFrom.x},0
                 L ${svgTo.x + adjustment.x * 2},${svgTo.y + adjustment.y * 2}
             `
-        );
+          );
+        }
       } else if (pointFrom.y === recta.top || pointFrom.y === recta.bottom) {
+        // console.log(3);
         this.path.setAttributeNS(
           null,
           "d",
@@ -188,6 +221,7 @@ const Arrow = (function () {
             `
         );
       } else if (pointFrom.x === recta.left || pointFrom.x === recta.right) {
+        // console.log(4);
         this.path.setAttributeNS(
           null,
           "d",
