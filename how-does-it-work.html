@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="index.css" />
+    <title>How does it work - Understanding pointers</title>
+    <style>
+      a {
+        color: #3c6ebd;
+      }
+      .center {
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>How does it work?</h1>
+    <main class="main">
+      <h2>SimpC</h2>
+      <p>
+        The C like statements are interpreted by JavaScript, right in the
+        browser. It's <em>really</em> simplistic. It only supports
+        <code>int</code> and pointers to <code>int</code> (arbitrary number of
+        them). There is no concept of <code>if</code>/<code>for</code>, no
+        functions, no structs.
+      </p>
+      <p>
+        The aim is to understand pointers, not build a C interpreted in the
+        browser :)
+      </p>
+      <h2>Memory representation</h2>
+      <p>
+        If you enable "Show raw bits", you will see how <code>int</code> and
+        pointers are usually stored in memory. <code>int</code> are stored as
+        two's complement (have a look at <code>-1</code>), and pointers are just
+        positive numbers all the time, so they are just a binary number
+        corresponding to the memory cell.
+      </p>
+      <p class="center"><a href="index.html">Go back</a></p>
+    </main>
+    <footer>
+      <p>Made by Mathieu Paturel, 2020</p>
+    </footer>
+  </body>
+</html>

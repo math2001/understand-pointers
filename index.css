@@ -131,10 +131,13 @@ h1 {
 
 footer {
   text-align: center;
+  color: #34495e;
+  font-family: var(--monospace);
+  font-size: 14px;
 }
 
 footer a {
-  color: #34495e;
+  color: #102233;
 }
 
 .CodeMirror-selected {
