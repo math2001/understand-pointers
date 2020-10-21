@@ -1,5 +1,6 @@
 :root {
   --monospace: "Roboto Mono", monospace;
+  --editor-selection-color: #bad8ec;
 }
 
 * {
@@ -129,4 +130,11 @@ footer {
 
 footer a {
   color: #34495e;
+}
+
+.CodeMirror-selected {
+  background-color: var(--editor-selection-color);
+}
+.CodeMirror-focused .CodeMirror-selected {
+  background-color: var(--editor-selection-color);
 }
