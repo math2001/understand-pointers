@@ -105,7 +105,6 @@ const Arrow = (function () {
       if (
         // too close horizontally
         (pointFrom.x === recta.left || pointFrom.x == recta.right) &&
-        (pointTo.x === rectb.left || pointTo.x == rectb.right) &&
         Math.abs(pointFrom.x - pointTo.x) < 48
       ) {
         tookLongerPath = true;
@@ -116,7 +115,6 @@ const Arrow = (function () {
       } else if (
         // too close vertically
         (pointFrom.y === recta.top || pointFrom.y === recta.bottom) &&
-        (pointTo.y === rectb.top || pointTo.y === rectb.bottom) &&
         Math.abs(pointFrom.y - pointTo.y) < 48
       ) {
         tookLongerPath = true;
