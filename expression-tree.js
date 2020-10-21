@@ -84,10 +84,15 @@ const buildExpressionTree = (function () {
     } else if (token.type === "single-quote") {
       const char = tokenline.consume();
       const quote = tokenline.consume();
-      if (token.type !== "single-quote") {
+      if (quote.type !== "single-quote") {
         throw new SimpCError("expected single character in single quotes");
       }
-      assert(char.value.toString().length === 1);
+      if (char.value.toString().length !== 1) {
+        throw new SimpCError(
+          `invalid character in single quotes ${char.value}`
+        );
+      }
+
       return {
         type: "char",
         value: char.value.toString().charCodeAt(0),
