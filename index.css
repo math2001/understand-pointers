@@ -81,6 +81,7 @@ h1 {
   vertical-align: bottom;
   text-align: center;
   position: relative;
+  font-family: var(--monospace);
 }
 
 .memory-table .memory-description {
@@ -102,7 +103,7 @@ h1 {
 .memory-table .memory-description:hover {
   text-overflow: initial;
   max-width: none;
-  z-index: 5;
+  z-index: 51;
 }
 
 .memory-table th {
@@ -122,6 +123,10 @@ h1 {
   color: #c0392b;
   padding: 4px 12px;
   margin: 12px 0;
+}
+
+.examples {
+  text-align: center;
 }
 
 .examples a {
