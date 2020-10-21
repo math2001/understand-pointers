@@ -18,14 +18,6 @@ const Arrow = (function () {
 
   class Arrow {
     constructor() {
-      this.from = document.createElement("div");
-      this.from.classList.add("point", "from");
-      document.body.appendChild(this.from);
-
-      this.to = document.createElement("div");
-      this.to.classList.add("point", "to");
-      document.body.appendChild(this.to);
-
       this.svgTail = document.createElementNS(XMLNS, "svg");
       this.svgTail.classList.add("svg-arrow");
       document.body.appendChild(this.svgTail);
@@ -99,12 +91,6 @@ const Arrow = (function () {
 
       const pointFrom = mindistancepoints[0];
       const pointTo = mindistancepoints[1];
-
-      this.from.style.left = pointFrom.x - POINT_SIZE / 2 + "px";
-      this.from.style.top = pointFrom.y - POINT_SIZE / 2 + "px";
-
-      this.to.style.left = pointTo.x - POINT_SIZE / 2 + "px";
-      this.to.style.top = pointTo.y - POINT_SIZE / 2 + "px";
 
       // if we have distance = 0, then we use 1
       const horizontalDistance = Math.abs(pointFrom.x - pointTo.x) || 1;
@@ -221,8 +207,6 @@ const Arrow = (function () {
     }
 
     destroy() {
-      this.to.parentElement.removeChild(this.to);
-      this.from.parentElement.removeChild(this.from);
       this.svgTail.parentElement.removeChild(this.svgTail);
       this.svgTip.parentElement.removeChild(this.svgTip);
     }
