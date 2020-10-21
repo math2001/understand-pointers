@@ -476,12 +476,8 @@ document.addEventListener("DOMContentLoaded", (_) => {
   };
 
   const saveStateToURLHash = () => {
-    const state = {
-      content: editor.getValue(),
-      showRawBits: showRawBits.checked,
-      activeLineIndex: activeLineIndex,
-    };
-    location.hash = base64encode(JSON.stringify(state));
+    location.hash =
+      (showRawBits.checked ? "1" : "0") + encodeURIComponent(editor.getValue());
   };
 
   editor.on("changes", (e) => {
@@ -527,9 +523,10 @@ document.addEventListener("DOMContentLoaded", (_) => {
 
   // restore the state from the hash
   if (location.hash != "") {
-    const state = JSON.parse(base64decode(location.hash.slice(1)));
-    editor.setValue(state.content);
-    showRawBits.checked = state.showRawBits;
-    assert(state.activeLineIndex === -1);
+    const state = location.hash.slice(1);
+    assert(state[0] === "1" || state[0] === "0");
+    showRawBits.checked = state[0] === "1";
+
+    editor.setValue(decodeURIComponent(state.slice(1)));
   }
 });
