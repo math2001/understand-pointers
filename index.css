@@ -134,6 +134,11 @@ h1 {
   margin: 0 4px;
 }
 
+.share {
+  font-style: italic;
+  text-align: center;
+}
+
 footer {
   text-align: center;
   color: #34495e;
