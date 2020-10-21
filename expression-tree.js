@@ -81,8 +81,18 @@ const buildExpressionTree = (function () {
         identifier: identifier.value,
         dereferenceCount: dereferenceCount,
       };
+    } else if (token.type === "single-quote") {
+      const char = tokenline.consume();
+      const quote = tokenline.consume();
+      if (token.type !== "single-quote") {
+        throw new SimpCError("expected single character in single quotes");
+      }
+      assert(char.value.toString().length === 1);
+      return {
+        type: "char",
+        value: char.value.toString().charCodeAt(0),
+      };
     }
-
     assert(token.type === "number" || token.type === "word");
     return token;
   };
@@ -176,6 +186,8 @@ const evalExpressionTree = (function () {
           node.identifier,
           node.dereferenceCount
         );
+      } else if (node.type === "char") {
+        return node;
       }
 
       assert(node.type === "number");

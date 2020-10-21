@@ -91,6 +91,10 @@ const evalSimpC = (function () {
           type: "semicolon",
           value: ";",
         });
+      } else if (c === "'") {
+        tokens.push({
+          type: "single-quote",
+        });
       } else {
         throw new SimpCError(`unknown char '${c}'`);
       }

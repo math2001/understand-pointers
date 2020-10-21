@@ -180,8 +180,13 @@ document.addEventListener("DOMContentLoaded", (_) => {
     _getBytes(typedvalue) {
       if (typedvalue.type === "int") {
         return this._getIntBytes(typedvalue);
-      } else if (typedvalue.type.endsWith("*")) {
+      }
+      if (typedvalue.type.endsWith("*")) {
         return this._getPointerBytes(typedvalue.value);
+      }
+
+      if (typedvalue.type === "char") {
+        return this._getCharBytes(typedvalue.value);
       }
 
       console.error(typedvalue.type);
@@ -262,9 +267,7 @@ document.addEventListener("DOMContentLoaded", (_) => {
     }
 
     _getCharBytes(value) {
-      assert(typeof value === "string");
-      assert(value.length === 1);
-      return [value.charCodeAt(0).toString(2)];
+      return [value.toString(2)];
     }
 
     _getIntBytes(typedvalue) {
@@ -307,8 +310,7 @@ document.addEventListener("DOMContentLoaded", (_) => {
       if (typedvalue.type === "int") {
         return typedvalue.value;
       } else if (typedvalue.type === "char") {
-        assert(typedvalue.value.length === 1);
-        return JSON.stringify(typedvalue.value);
+        return `'${String.fromCharCode(typedvalue.value)}'`;
       } else if (typedvalue.type[typedvalue.type.length - 1] === "*") {
         if (typedvalue.value === null) {
           return "NULL";
