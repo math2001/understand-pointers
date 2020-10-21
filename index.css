@@ -30,10 +30,6 @@ h1 {
   display: flex;
 }
 
-.split > article {
-  flex: 1 1 0;
-}
-
 .toolbar {
   text-align: center;
 }
@@ -52,6 +48,8 @@ h1 {
   margin: 0;
   position: relative;
   height: 480px;
+  width: 100%;
+  position: relative;
 }
 
 .editor .highlight {
