@@ -397,7 +397,7 @@ document.addEventListener("DOMContentLoaded", (_) => {
     const row = document.createElement("tr");
     const addr = document.createElement("th");
     addr.textContent =
-      "0x" + (rownum * BYTES_PER_ROW).toString(16).padStart(3, "0");
+      "0x" + (rownum * BYTES_PER_ROW).toString(16).padStart(2, "0");
     row.appendChild(addr);
 
     for (let i = 0; i < BYTES_PER_ROW; i++) {
