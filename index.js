@@ -462,7 +462,11 @@ document.addEventListener("DOMContentLoaded", (_) => {
       if (ranMeaningfulLine) break;
       activeLineIndex++;
     }
-    return activeLineIndex < lines.length - 1;
+    if (activeLineIndex < lines.length - 1) {
+      return true;
+    }
+    activeLineIndex = lines.length - 1;
+    return false;
   };
 
   const removeActiveLineHighlight = () => {
