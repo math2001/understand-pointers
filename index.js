@@ -491,6 +491,7 @@ document.addEventListener("DOMContentLoaded", (_) => {
 
   runlineButton.addEventListener("click", (e) => {
     e.preventDefault();
+    editor.save();
     removeActiveLineHighlight();
     runLine();
     addActiveLineHighlight();
@@ -500,6 +501,7 @@ document.addEventListener("DOMContentLoaded", (_) => {
   runallButton.addEventListener("click", (e) => {
     e.preventDefault();
     removeActiveLineHighlight();
+    editor.save();
     while (runLine()) {
       // runs the next line (runLine returns false when there are no more lines to run, or an error occurs)
     }
@@ -528,10 +530,6 @@ document.addEventListener("DOMContentLoaded", (_) => {
     const state = JSON.parse(base64decode(location.hash.slice(1)));
     editor.setValue(state.content);
     showRawBits.checked = state.showRawBits;
-    while (activeLineIndex < state.activeLineIndex) {
-      assert(runLine() === true);
-    }
-    if (activeLineIndex >= 0) addActiveLineHighlight();
-    saveStateToURLHash();
+    assert(state.activeLineIndex === -1);
   }
 });
