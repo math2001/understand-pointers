@@ -484,8 +484,10 @@ document.addEventListener("DOMContentLoaded", (_) => {
       (showRawBits.checked ? "1" : "0") + encodeURIComponent(editor.getValue());
   };
 
-  editor.on("changes", (e) => {
+  editor.on("beforeChange", (e) => {
     resetExecution();
+  });
+  editor.on("changes", () => {
     saveStateToURLHash();
   });
 
