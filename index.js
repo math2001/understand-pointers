@@ -521,6 +521,20 @@ document.addEventListener("DOMContentLoaded", (_) => {
   memoryView.innerHTML = "";
   memoryView.appendChild(memoryTable);
 
+  for (let element of document.querySelectorAll("[data-load-example]")) {
+    element.addEventListener("click", (e) => {
+      e.preventDefault();
+      const content = examples[e.target.getAttribute("data-load-example")];
+      if (content === undefined) {
+        alert("internal error: couldn't load the example");
+        return;
+      }
+      assert(content[0] === "\n");
+      assert(typeof content === "string");
+      editor.setValue(content.slice(1));
+    });
+  }
+
   // restore the state from the hash
   if (location.hash != "") {
     const state = location.hash.slice(1);
@@ -529,4 +543,41 @@ document.addEventListener("DOMContentLoaded", (_) => {
 
     editor.setValue(decodeURIComponent(state.slice(1)));
   }
+
+  editor.setSize("100%", "100%");
+
+  const examples = {
+    pointers: `
+int a = 10;
+int *p = NULL; // points to nothing
+p = &a;        // p points to a
+*p = 11;       // changes the value of
+               // what p points to (a)
+`,
+    pointersComment: `
+int a = 10; // declare an integer (2 bytes)
+int b = 20; // declare another integer
+
+int *p = NULL; // points to nothing
+p = &a;        // p points to a
+p = &b;        // p points to b
+*p = 21;       // updates what p points to (b)
+`,
+    "pointer-to-pointer": `
+int a = 10;
+int b = 20;
+int *p = &a;   // pointer that points to a
+int **pp = &p; // pointer that points to a pointer
+
+*pp = &b;  // change the value of p
+**pp = 21; // change the value b
+`,
+    "pointer-walk": `
+int a = 10;
+int *p1 = &a;
+int **p2 = &p1;
+int ***p3 = &p2;
+int ****p4 = &p3;
+`,
+  };
 });
