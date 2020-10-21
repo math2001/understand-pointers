@@ -87,6 +87,12 @@ h1 {
   max-width: calc(100% - 4px);
 }
 
+.memory-table .memory-description:hover {
+  text-overflow: initial;
+  max-width: none;
+  z-index: 5;
+}
+
 .memory-table th {
   font-weight: normal;
   vertical-align: bottom;
