@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", (_) => {
   };
 
   class Memory {
-    constructor(tableElement) {
+    constructor(tableElement, showRawBits) {
       assert(tableElement instanceof HTMLElement);
 
       this.table = tableElement;
@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", (_) => {
         memoryTable.appendChild(row);
       }
 
-      this.showRawBits = document.querySelector("#show-raw-bits");
+      this.showRawBits = showRawBits;
       assert(this.showRawBits !== null);
 
       this.showRawBits.addEventListener("change", () => {
@@ -412,6 +412,7 @@ document.addEventListener("DOMContentLoaded", (_) => {
   const runallButton = select("#run-all");
   const editor = CodeMirror.fromTextArea(document.querySelector("#editor"), {});
   const output = select("#output");
+  const showRawBits = select("#show-raw-bits");
 
   const memoryTable = document.createElement("table");
   memoryTable.classList.add("memory-table");
@@ -474,8 +475,18 @@ document.addEventListener("DOMContentLoaded", (_) => {
     editor.addLineClass(activeLineIndex, "background", "highlight");
   };
 
+  const saveStateToURLHash = () => {
+    const state = {
+      content: editor.getValue(),
+      showRawBits: showRawBits.checked,
+      activeLineIndex: activeLineIndex,
+    };
+    location.hash = base64encode(JSON.stringify(state));
+  };
+
   editor.on("changes", (e) => {
     resetExecution();
+    saveStateToURLHash();
   });
 
   runlineButton.addEventListener("click", (e) => {
@@ -484,6 +495,7 @@ document.addEventListener("DOMContentLoaded", (_) => {
     removeActiveLineHighlight();
     runLine();
     addActiveLineHighlight();
+    saveStateToURLHash();
   });
 
   runallButton.addEventListener("click", (e) => {
@@ -494,16 +506,30 @@ document.addEventListener("DOMContentLoaded", (_) => {
       // runs the next line (runLine returns false when there are no more lines to run, or an error occurs)
     }
     addActiveLineHighlight();
+    saveStateToURLHash();
+  });
+
+  showRawBits.addEventListener("change", (e) => {
+    saveStateToURLHash();
   });
 
   document.querySelector("#reset-exec").addEventListener("click", (e) => {
     e.preventDefault();
     resetExecution();
+    saveStateToURLHash();
   });
 
-  const memory = new Memory(memoryTable);
+  const memory = new Memory(memoryTable, showRawBits);
   window.editor = editor;
 
   memoryView.innerHTML = "";
   memoryView.appendChild(memoryTable);
+
+  // restore the state from the hash
+  if (location.hash != "") {
+    const state = JSON.parse(base64decode(location.hash.slice(1)));
+    editor.setValue(state.content);
+    showRawBits.checked = state.showRawBits;
+    assert(state.activeLineIndex === -1);
+  }
 });

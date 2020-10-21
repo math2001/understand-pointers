@@ -83,3 +83,24 @@ class SimpCError extends Error {
     this.name = "SimpCError";
   }
 }
+
+// encode and decoded adapted from
+// https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/btoa
+
+// this function's aren't space efficient. Most bytes are stored as two bytes.
+const base64encode = (string) => {
+  const codeUnits = new Uint16Array(string.length);
+  for (let i = 0; i < codeUnits.length; i++) {
+    codeUnits[i] = string.charCodeAt(i);
+  }
+  return btoa(String.fromCharCode(...new Uint8Array(codeUnits.buffer)));
+};
+
+const base64decode = (string) => {
+  const binary = atob(string);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < bytes.length; i++) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  return String.fromCharCode(...new Uint16Array(bytes.buffer));
+};
