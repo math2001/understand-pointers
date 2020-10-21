@@ -112,6 +112,11 @@ h1 {
   margin: 12px 0;
 }
 
+.examples a {
+  color: #3c6ebd;
+  margin: 0 4px;
+}
+
 footer {
   text-align: center;
 }
