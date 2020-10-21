@@ -21,7 +21,7 @@ h1 {
 
 .main {
   background-color: white;
-  width: 960px;
+  width: 1024px;
   margin: auto;
   padding: 12px 24px;
 }
@@ -36,9 +36,16 @@ h1 {
 
 .code-view,
 .memory-view {
-  width: 50%;
   display: inline-block;
   vertical-align: top;
+}
+
+.code-view {
+  width: calc(100% - 460px);
+}
+
+.memory-view {
+  width: 460px; /* 5 * 92px */
 }
 
 .editor {
@@ -58,6 +65,7 @@ h1 {
 
 .memory-table {
   border-collapse: collapse;
+  width: 100%;
 }
 
 .memory-table td {
