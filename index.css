@@ -49,6 +49,11 @@ h1 {
   width: 460px; /* 5 * 92px */
 }
 
+.memory-view h3 {
+  text-align: center;
+  margin-top: 0;
+}
+
 .editor {
   font-family: var(--monospace);
   font-size: 16px;

@@ -409,7 +409,7 @@ document.addEventListener("DOMContentLoaded", (_) => {
     return row;
   };
 
-  const memoryView = select("#memory-view");
+  const memoryTableContainer = select("#memory-table-container");
   const runlineButton = select("#run-line");
   const runallButton = select("#run-all");
   const editor = CodeMirror.fromTextArea(document.querySelector("#editor"), {});
@@ -526,9 +526,10 @@ document.addEventListener("DOMContentLoaded", (_) => {
   const memory = new Memory(memoryTable, showRawBits);
   window.editor = editor;
 
-  memoryView.innerHTML = "";
-  memoryView.appendChild(memoryTable);
+  memoryTableContainer.innerHTML = "";
+  memoryTableContainer.appendChild(memoryTable);
 
+  // load examples when they are clicked
   for (let element of document.querySelectorAll("[data-load-example]")) {
     element.addEventListener("click", (e) => {
       e.preventDefault();
